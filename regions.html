@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine Regions — Vino Bled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a1410;--bg2:#221c15;--bg3:#2a221a;
+  --cream:#f0e8d8;--cream-dim:#bfb5a0;
+  --terra:#c4613a;--ochre:#c49a3a;--olive:#6b7a42;
+  --border:rgba(232,224,208,0.12);--border2:rgba(232,224,208,0.25);
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.7;overflow-x:hidden}
+
+/* LANG BAR */
+.lang-bar{display:flex;justify-content:flex-end;align-items:center;padding:.4rem 3rem;background:rgba(26,20,16,.97);border-bottom:1px solid var(--border);gap:.25rem}
+.lang-btn{font-family:var(--sans);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);background:transparent;border:none;padding:.3rem .6rem;cursor:pointer;border-radius:2px;transition:color .2s,background .2s}
+.lang-btn:hover{color:var(--cream)}
+.lang-btn.active{color:var(--terra);background:rgba(196,97,58,.1)}
+.lang-sep{color:var(--border2);font-size:.7rem}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 3rem;border-bottom:1px solid var(--border);position:sticky;top:30px;background:rgba(26,20,16,.95);backdrop-filter:blur(12px);z-index:100}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;color:var(--cream);text-decoration:none}
+.nav-logo span{color:var(--terra)}
+.nav-back{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-dim);text-decoration:none;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.nav-back:hover{color:var(--cream)}
+.nav-back::before{content:'←'}
+
+/* HERO */
+.page-hero{padding:2.5rem 3rem 2rem;border-bottom:1px solid var(--border);background:var(--bg2)}
+.page-eyebrow{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--terra);margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem}
+.page-eyebrow::before{content:'';display:block;width:1.5rem;height:1px;background:var(--terra)}
+.page-title{font-family:var(--serif);font-size:clamp(2.5rem,5vw,4.5rem);font-weight:300;line-height:1.1;color:var(--cream);margin-bottom:.75rem}
+.page-title em{font-style:italic;color:var(--cream-dim)}
+.page-intro{font-size:1.05rem;color:var(--cream-dim);max-width:680px;line-height:1.85}
+
+/* MAP */
+.map-section{padding:1.5rem;border-bottom:1px solid var(--border)}
+.map-section img{width:100%;max-width:900px;display:block;margin:0 auto;border-radius:2px;border:1px solid var(--border)}
+
+/* REGION BLOCKS */
+.region-block{border-bottom:1px solid var(--border)}
+.region-header{padding:1.5rem 3rem 2rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:2rem;transition:background .3s}
+.region-header:hover{background:var(--bg2)}
+.region-header-left{display:flex;align-items:baseline;gap:1.5rem}
+.region-num{font-family:var(--serif);font-size:3rem;font-weight:300;color:var(--border2);line-height:1;transition:color .3s}
+.region-block.open .region-num{color:var(--terra)}
+.region-name{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--cream)}
+.region-tag{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);border:1px solid var(--border);padding:.25rem .75rem;border-radius:1px}
+.region-toggle{font-size:1.2rem;color:var(--terra);transition:transform .3s;flex-shrink:0}
+.region-block.open .region-toggle{transform:rotate(45deg)}
+.region-body{display:none;padding:0 3rem 1.5rem}
+.region-block.open .region-body{display:block}
+
+/* DISTRICT */
+.district{padding:1.25rem 0;border-top:1px solid var(--border)}
+.district:first-child{border-top:none;padding-top:0}
+.district-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+.district-name{font-family:var(--serif);font-size:1.6rem;font-weight:400;color:var(--cream);margin-bottom:.5rem}
+.district-label{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);margin-bottom:.5rem}
+.district-desc{font-size:.95rem;color:var(--cream-dim);line-height:1.85;margin-bottom:.75rem}
+.grapes-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ochre);margin-bottom:.6rem}
+.grape-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.grape-tag{font-size:.72rem;padding:.25rem .75rem;border:1px solid rgba(196,154,58,.3);border-radius:1px;color:var(--ochre)}
+.winemakers-placeholder{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1.5rem;border-style:dashed}
+.winemakers-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cream-dim);margin-bottom:.75rem}
+.winemaker-slot{padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.85rem;color:rgba(168,158,138,.5);font-style:italic}
+.winemaker-slot:last-child{border-bottom:none}
+
+/* FOOTER */
+footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:var(--serif);color:var(--cream-dim)}
+.footer-logo span{color:var(--terra)}
+.footer-copy{font-size:.72rem;color:rgba(168,158,138,.4)}
+
+@media(max-width:800px){
+  nav,section,.page-hero,.map-section,.region-header,.region-body{padding-left:1.5rem;padding-right:1.5rem}
+  .district-grid{grid-template-columns:1fr}
+  .region-header-left{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button class="lang-btn active" data-lang="en" onclick="applyLang('en')">EN</button><span class="lang-sep">·</span>
+  <button class="lang-btn" data-lang="sl" onclick="applyLang('sl')">SL</button><span class="lang-sep">·</span>
+  <button class="lang-btn" data-lang="de" onclick="applyLang('de')">DE</button><span class="lang-sep">·</span>
+  <button class="lang-btn" data-lang="it" onclick="applyLang('it')">IT</button><span class="lang-sep">·</span>
+  <button class="lang-btn" data-lang="ru" onclick="applyLang('ru')">RU</button><span class="lang-sep">·</span>
+  <button class="lang-btn" data-lang="zh" onclick="applyLang('zh')">中文</button>
+</div>
+<nav>
+  <a href="vino-bled.html" class="nav-logo">Vino <span>Bled</span></a>
+  <a href="vino-bled.html#explore" class="nav-back" data-i18n="nav_back">Back to wines</a>
+</nav>
+
+<div class="page-hero">
+  <div class="page-eyebrow" data-i18n="eyebrow">Wine regions of Slovenia</div>
+  <h1 class="page-title" data-i18n="page_title">Nine districts,<br><em>one country.</em></h1>
+  <p class="page-intro" data-i18n="page_intro">From the sun-baked hills of Goriška Brda to the cool terraced vineyards of Štajerska, Slovenia packs an extraordinary range of terroirs into a country the size of a small Italian province. Three macro-regions, nine distinct districts — each shaped by its own soil, wind and winemaking tradition. Here they are, one by one.</p>
+</div>
+
+<div class="map-section">
+  <img src="images/map-slovenia.jpg" alt="Wine regions of Slovenia">
+</div>
+
+<!-- PRIMORSKA -->
+<div class="region-block open" id="primorska">
+  <div class="region-header" onclick="toggleRegion('primorska')">
+    <div class="region-header-left">
+      <span class="region-num">01</span>
+      <div>
+        <div class="region-name" data-i18n="r01">Primorska</div>
+        <div style="font-size:.85rem;color:var(--cream-dim);margin-top:.25rem" data-i18n="r01_sub">Mediterranean · 4 districts · ~6,400 ha</div>
+      </div>
+    </div>
+    <span class="region-toggle">+</span>
+  </div>
+  <div class="region-body">
+
+    <!-- Goriška Brda -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Goriška Brda</h2>
+          <p class="district-desc" data-i18n="d_brda">They call it the Slovenian Tuscany — and once you see the terraced hills rolling towards the Italian border, you understand why. But Brda is its own thing entirely. The legendary <em>opoka</em> soil — ancient flysch compressed into alternating layers of marl and sandstone — gives wines here an electrifying minerality that no other place in the world can replicate. Between the Julian Alps to the north and the warm Adriatic breath from the south, Rebula ripens slowly on impossibly steep slopes, harvested by hand, and makes wines of crystalline precision and depth. One producer for every eight inhabitants: this is wine country in the most fundamental sense.</p>
+          <div class="grapes-title" data-i18n="grapes">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Rebula (Ribolla Gialla)</span>
+            <span class="grape-tag">Merlot</span>
+            <span class="grape-tag">Chardonnay</span>
+            <span class="grape-tag">Pinot Grigio</span>
+            <span class="grape-tag">Sauvignonasse</span>
+            <span class="grape-tag">Cabernet Sauvignon</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_brda">Our winemakers from Goriška Brda</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vipavska dolina -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Vipavska dolina</h2>
+          <p class="district-desc" data-i18n="d_vipava">The Vipava Valley is shaped by wind. The <em>Burja</em> — a fierce northeast gale that can tear through the valley at 120 km/h ten times a year — keeps disease away, concentrates flavours, and defines the character of every bottle made here. Vines grow low to the ground, roots drilling fifteen metres deep into flysch soils to find water and minerals. The result is wines of surprising purity: white blends of Zelen, Pinela, Malvasia and Rebula that carry the freshness of the Alps and the warmth of the Adriatic simultaneously. This is also where Slovenia's most exciting winemaking experiments happen — an irreverent, forward-thinking valley that has nothing to prove.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Zelen</span>
+            <span class="grape-tag">Pinela</span>
+            <span class="grape-tag">Malvasia</span>
+            <span class="grape-tag">Rebula</span>
+            <span class="grape-tag">Merlot</span>
+            <span class="grape-tag">Cabernet Franc</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_vipava">Our winemakers from Vipavska dolina</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kras -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Kras</h2>
+          <p class="district-desc" data-i18n="d_kras">The word <em>karst</em> — used worldwide to describe limestone landscapes — was coined here. On this rugged plateau above the Gulf of Trieste, white limestone bedrock is blanketed with a layer of iron-rich red soil the colour of dried blood: <em>terra rossa</em>. From it comes Teran, one of Slovenia's most ancient and protected wines — a deep ruby-almost-black red with bracingly high acidity, wild berry aromas and an iron-mineral grip that feels like drinking the land itself. Sold in Viennese pharmacies in the 16th century as a remedy for anaemia. Some things are better explained through taste than history.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Refošk / Teran (PDO)</span>
+            <span class="grape-tag">Vitovska Grganja</span>
+            <span class="grape-tag">Malvasia</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_kras">Our winemakers from Kras</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slovenska Istra -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Slovenska Istra</h2>
+          <p class="district-desc" data-i18n="d_istra">Slovenia's warmest vineyards look out over the Adriatic. Three winds take turns shaping the growing season: the cold <em>Burja</em>, the warm <em>Jugo</em>, and the salt-scented <em>Maestral</em> off the sea. Here Refošk is king — a grape of vivid cherry colour, firm acidity and a character that shifts from rich and velvety on the coast to darker and wilder just a few kilometres inland. And then there is Malvasia — queen of the Istrian whites — arriving with acacia blossom, citrus and bitter almond, a wine that smells of Mediterranean summers and lingers long on the finish. Wine traditions here trace back to Roman times, when Livia, wife of Augustus, reportedly had roads built into Istria just to secure her supply.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Refošk</span>
+            <span class="grape-tag">Malvasia Istriana</span>
+            <span class="grape-tag">Cabernet Franc</span>
+            <span class="grape-tag">Merlot</span>
+            <span class="grape-tag">Rumeni Muskat</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_istra">Our winemakers from Slovenska Istra</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PODRAVJE -->
+<div class="region-block open" id="podravje">
+  <div class="region-header" onclick="toggleRegion('podravje')">
+    <div class="region-header-left">
+      <span class="region-num">02</span>
+      <div>
+        <div class="region-name" data-i18n="r02">Podravje</div>
+        <div style="font-size:.85rem;color:var(--cream-dim);margin-top:.25rem" data-i18n="r02_sub">Continental · 2 districts · ~5,850 ha</div>
+      </div>
+    </div>
+    <span class="region-toggle">+</span>
+  </div>
+  <div class="region-body">
+
+    <!-- Štajerska Slovenija -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Štajerska Slovenija</h2>
+          <p class="district-desc" data-i18n="d_staj">Slovenia's largest wine district — nearly 40% of all national production — sits where the cool Pohorje Hills meet the warm breath of the Pannonian Plain. Steep terraced vineyards at 350–600 metres produce whites of remarkable aromatic precision and natural freshness. Sauvignon Blanc here develops a lively, herbaceous character; Šipon (Furmint) achieves genuine complexity; Rhine Riesling and Muscat offer some of the most expressive examples in Central Europe. And here stands the <em>Stara trta</em> in Maribor — a single grapevine over 450 years old, certified by Guinness as the world's oldest. Still producing grapes. Still making wine.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Šipon (Furmint)</span>
+            <span class="grape-tag">Sauvignon Blanc</span>
+            <span class="grape-tag">Rhine Riesling</span>
+            <span class="grape-tag">Welschriesling</span>
+            <span class="grape-tag">Traminer</span>
+            <span class="grape-tag">Muscat</span>
+            <span class="grape-tag">Pinot Gris</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_staj">Our winemakers from Štajerska</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prekmurje -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Prekmurje</h2>
+          <p class="district-desc" data-i18n="d_prek">Tucked into Slovenia's northeastern corner, pressed between the Mura River and the Hungarian border, Prekmurje is a land apart — flat, quiet, unhurried, with volcanic soils and a deeply continental climate of hot summers and cold winters. Hungarian winemaking traditions bleed across the border; so does a taste for Welschriesling, Chardonnay, and Blaufränkisch (Modra Frankinja) with genuine depth and structure. Small production, low profile, singular character. This is where you find wines that taste like a place nobody has thought to visit yet.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Welschriesling</span>
+            <span class="grape-tag">Chardonnay</span>
+            <span class="grape-tag">Blaufränkisch</span>
+            <span class="grape-tag">Pinot Blanc</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_prek">Our winemakers from Prekmurje</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- POSAVJE -->
+<div class="region-block open" id="posavje">
+  <div class="region-header" onclick="toggleRegion('posavje')">
+    <div class="region-header-left">
+      <span class="region-num">03</span>
+      <div>
+        <div class="region-name" data-i18n="r03">Posavje</div>
+        <div style="font-size:.85rem;color:var(--cream-dim);margin-top:.25rem" data-i18n="r03_sub">Continental · 3 districts · ~2,650 ha</div>
+      </div>
+    </div>
+    <span class="region-toggle">+</span>
+  </div>
+  <div class="region-body">
+
+    <!-- Dolenjska -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Dolenjska</h2>
+          <p class="district-desc" data-i18n="d_dol">The birthplace of <em>Cviček</em> — Slovenia's most characterful traditional wine and one of the most unusual in all of Europe. A pale ruby blend of red and white grapes, light in body, high in acidity, low in alcohol, and totally honest about what it is: a wine made for food and company rather than for impressing anyone. The gently rolling hills of Dolenjska, cooled by alpine influences and warmed by continental summers, produce 7,500 winemakers who still make wine for the pleasure of it. Cviček has PGI protection — because you simply cannot make it anywhere else.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Žametovka</span>
+            <span class="grape-tag">Blaufränkisch</span>
+            <span class="grape-tag">Welschriesling</span>
+            <span class="grape-tag">Cviček blend (PGI)</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_dol">Our winemakers from Dolenjska</div>
+            <div class="winemaker-slot">— to be added —</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bizeljsko-Sremič -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Bizeljsko-Sremič</h2>
+          <p class="district-desc" data-i18n="d_biz">Between the Sava and Sotla rivers lies a landscape unlike anywhere else in Slovenia — vineyards protected from harsh northern winds by low mountains, and beneath the ground an extraordinary network of hand-dug caves called <em>repnice</em>, carved into soft sandstone to store wine at a perfect natural temperature. The Blaufränkisch from this district has come a long way from its humble origins: structured, spicy, and quietly impressive. The district is also building a reputation for sparkling wines made in the traditional method — cool nights and a long growing season doing what they do best.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Blaufränkisch</span>
+            <span class="grape-tag">Bizeljčan (traditional)</span>
+            <span class="grape-tag">Pinot Noir</span>
+            <span class="grape-tag">Chardonnay</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_biz">Our winemakers from Bizeljsko-Sremič</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bela krajina -->
+    <div class="district">
+      <div class="district-grid">
+        <div>
+                    <h2 class="district-name">Bela krajina</h2>
+          <p class="district-desc" data-i18n="d_bela">Slovenia's smallest wine district sits in the far south, where the Gorjanci Hills give way to warm limestone plains and the first hints of Adriatic warmth reach continental Posavje. The temperature swings between day and night are dramatic — which means one thing for wine: extraordinary aromatic intensity and freshness preserved in every bottle. Bela Krajina made the first ice wine and the first rosé in Slovenia. Its Blaufränkisch and Yellow Muscat are the district's signatures; its dessert wines are among the country's most celebrated. Small in size, large in ambition.</p>
+          <div class="grapes-title">Signature grapes</div>
+          <div class="grape-tags">
+            <span class="grape-tag">Blaufränkisch</span>
+            <span class="grape-tag">Gelber Muskateller</span>
+            <span class="grape-tag">Sauvignon Blanc</span>
+            <span class="grape-tag">Pinot Noir</span>
+            <span class="grape-tag">Metliška Črnina (PGI)</span>
+          </div>
+        </div>
+        <div>
+          <div class="winemakers-placeholder">
+            <div class="winemakers-title" data-i18n="wm_title_bela">Our winemakers from Bela krajina</div>
+            <div class="winemaker-slot">— to be added —</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="padding:1.5rem;text-align:center;border-bottom:1px solid var(--border);background:var(--bg2)">
+  <div style="font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:300;color:var(--cream);margin-bottom:.75rem" data-i18n="cta_title">Ready to taste?</div>
+  <p style="font-size:.95rem;color:var(--cream-dim);margin-bottom:1.75rem" data-i18n="cta_sub">Book a tasting in our historic cellar in the heart of Bled.</p>
+  <a href="vino-bled.html#booking" style="font-family:var(--sans);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--terra);padding:.85rem 2.5rem;border-radius:2px;text-decoration:none;transition:background .2s" data-i18n="cta_btn">Book a tasting</a>
+</div>
+<footer>
+  <div class="footer-logo">Vino <span>Bled</span> — Slovenia Wine Experience</div>
+  <div class="footer-copy">© 2025 Vino Bled. Bled, Slovenia.</div>
+</footer>
+
+<script>
+function toggleRegion(id) {
+  const block = document.getElementById(id);
+  block.classList.toggle('open');
+}
+
+const T = {
+  en: {
+    nav_back: "← Back to wines",
+    eyebrow: "Wine regions of Slovenia",
+    page_title: "Nine districts,<br><em>one country.</em>",
+    page_intro: "From the sun-baked hills of Goriška Brda to the cool terraced vineyards of Štajerska, Slovenia packs an extraordinary range of terroirs into a country the size of a small Italian province. Three macro-regions, nine distinct districts — each shaped by its own soil, wind and winemaking tradition.",
+    r01: 'Primorska', r01_sub: "Mediterranean · 4 districts · ~6,400 ha",
+    r02: 'Podravje',  r02_sub: "Continental · 2 districts · ~5,850 ha",
+    r03: 'Posavje',   r03_sub: "Continental · 3 districts · ~2,650 ha",
+    grapes: "Signature grapes",
+    wm_title_brda: "Our winemakers from Goriška Brda",
+    wm_title_vipava: "Our winemakers from Vipavska dolina",
+    wm_title_kras: "Our winemakers from Kras",
+    wm_title_istra: "Our winemakers from Slovenska Istra",
+    wm_title_staj: "Our winemakers from Štajerska",
+    wm_title_prek: "Our winemakers from Prekmurje",
+    wm_title_dol: "Our winemakers from Dolenjska",
+    wm_title_biz: "Our winemakers from Bizeljsko-Sremič",
+    wm_title_bela: "Our winemakers from Bela krajina",
+    wm_empty: "— to be added —",
+    cta_title: "Ready to taste?",
+    cta_sub: "Book a tasting in our historic cellar in the heart of Bled.",
+    cta_btn: "Book a tasting",
+    d_brda: "They call it the Slovenian Tuscany — and once you see the terraced hills rolling towards the Italian border, you understand why. But Brda is its own thing entirely. The legendary <em>opoka</em> soil — ancient flysch compressed into alternating layers of marl and sandstone — gives wines here an electrifying minerality that no other place in the world can replicate. Between the Julian Alps to the north and the warm Adriatic breath from the south, Rebula ripens slowly on impossibly steep slopes, harvested by hand, and makes wines of crystalline precision and depth. One producer for every eight inhabitants: this is wine country in the most fundamental sense.",
+    d_vipava: "The Vipava Valley is shaped by wind. The <em>Burja</em> — a fierce northeast gale that can tear through the valley at 120 km/h ten times a year — keeps disease away, concentrates flavours, and defines the character of every bottle made here. Vines grow low to the ground, roots drilling fifteen metres deep into flysch soils to find water and minerals. The result is wines of surprising purity: white blends of Zelen, Pinela, Malvasia and Rebula that carry the freshness of the Alps and the warmth of the Adriatic simultaneously. This is also where Slovenia's most exciting winemaking experiments happen — an irreverent, forward-thinking valley that has nothing to prove.",
+    d_kras: "The word <em>karst</em> — used worldwide to describe limestone landscapes — was coined here. On this rugged plateau above the Gulf of Trieste, white limestone bedrock is blanketed with a layer of iron-rich red soil the colour of dried blood: <em>terra rossa</em>. From it comes Teran, one of Slovenia's most ancient and protected wines — a deep ruby-almost-black red with bracingly high acidity, wild berry aromas and an iron-mineral grip that feels like drinking the land itself. Sold in Viennese pharmacies in the 16th century as a remedy for anaemia. Some things are better explained through taste than history.",
+    d_istra: "Slovenia's warmest vineyards look out over the Adriatic. Three winds take turns shaping the growing season: the cold <em>Burja</em>, the warm <em>Jugo</em>, and the salt-scented <em>Maestral</em> off the sea. Here Refošk is king — a grape of vivid cherry colour, firm acidity and a character that shifts from rich and velvety on the coast to darker and wilder just a few kilometres inland. And then there is Malvasia — queen of the Istrian whites — arriving with acacia blossom, citrus and bitter almond, a wine that smells of Mediterranean summers and lingers long on the finish.",
+    d_staj: "Slovenia's largest wine district — nearly 40% of all national production — sits where the cool Pohorje Hills meet the warm breath of the Pannonian Plain. Steep terraced vineyards at 350–600 metres produce whites of remarkable aromatic precision and natural freshness. Sauvignon Blanc here develops a lively, herbaceous character; Šipon (Furmint) achieves genuine complexity; Rhine Riesling and Muscat offer some of the most expressive examples in Central Europe. And here stands the <em>Stara trta</em> in Maribor — a single grapevine over 450 years old, certified by Guinness as the world's oldest. Still producing grapes. Still making wine.",
+    d_prek: "Tucked into Slovenia's northeastern corner, pressed between the Mura River and the Hungarian border, Prekmurje is a land apart — flat, quiet, unhurried, with volcanic soils and a deeply continental climate of hot summers and cold winters. Hungarian winemaking traditions bleed across the border; so does a taste for Welschriesling, Chardonnay, and Blaufränkisch with genuine depth and structure. Small production, low profile, singular character. This is where you find wines that taste like a place nobody has thought to visit yet.",
+    d_dol: "The birthplace of <em>Cviček</em> — Slovenia's most characterful traditional wine and one of the most unusual in all of Europe. A pale ruby blend of red and white grapes, light in body, high in acidity, low in alcohol, and totally honest about what it is: a wine made for food and company rather than for impressing anyone. The gently rolling hills of Dolenjska, cooled by alpine influences and warmed by continental summers, produce 7,500 winemakers who still make wine for the pleasure of it. Cviček has PGI protection — because you simply cannot make it anywhere else.",
+    d_biz: "Between the Sava and Sotla rivers lies a landscape unlike anywhere else in Slovenia — vineyards protected from harsh northern winds by low mountains, and beneath the ground an extraordinary network of hand-dug caves called <em>repnice</em>, carved into soft sandstone to store wine at a perfect natural temperature. The Blaufränkisch from this district has come a long way from its humble origins: structured, spicy, and quietly impressive. The district is also building a reputation for sparkling wines made in the traditional method — cool nights and a long growing season doing what they do best.",
+    d_bela: "Slovenia's smallest wine district sits in the far south, where the Gorjanci Hills give way to warm limestone plains and the first hints of Adriatic warmth reach continental Posavje. The temperature swings between day and night are dramatic — which means one thing for wine: extraordinary aromatic intensity and freshness preserved in every bottle. Bela Krajina made the first ice wine and the first rosé in Slovenia. Its Blaufränkisch and Yellow Muscat are the district's signatures; its dessert wines are among the country's most celebrated. Small in size, large in ambition.",
+  },
+  sl: {
+    nav_back: "← Nazaj na vina",
+    eyebrow: "Vinske regije Slovenije",
+    page_title: "Devet okolišev,<br><em>ena dežela.</em>",
+    page_intro: "Od soncu izpostavljenih gričev Goriških Brd do svežih terasastih vinogradov Štajerske — Slovenija na površini manjše italijanske province skriva izjemno raznolikost terrajev. Tri makroregije, devet okolišev — vsak oblikovan s svojo zemljo, vetrom in vinogradniško tradicijo.",
+    r01: 'Primorska', r01_sub: "Sredozemska · 4 okoliši · ~6.400 ha",
+    r02: 'Podravje',  r02_sub: "Celinska · 2 okoliša · ~5.850 ha",
+    r03: 'Posavje',   r03_sub: "Celinska · 3 okoliši · ~2.650 ha",
+    grapes: "Značilne sorte grozdja",
+    wm_title_brda: "Naši vinarji iz Goriških Brd",
+    wm_title_vipava: "Naši vinarji iz Vipavske doline",
+    wm_title_kras: "Naši vinarji s Krasa",
+    wm_title_istra: "Naši vinarji iz Slovenske Istre",
+    wm_title_staj: "Naši vinarji iz Štajerske",
+    wm_title_prek: "Naši vinarji iz Prekmurja",
+    wm_title_dol: "Naši vinarji z Dolenjske",
+    wm_title_biz: "Naši vinarji iz Bizeljsko-Sremiča",
+    wm_title_bela: "Naši vinarji iz Bele krajine",
+    wm_empty: "— bo dodano —",
+    d_brda: "Imenujejo jo slovenska Toskana — in ko ugledaš terasaste griče, ki se vrstijo proti italijanski meji, razumeš zakaj. A Brda so povsem svoja stvar. Legendarno tlo <em>opoka</em> — stari fliš, stisnjen v izmenične plasti laporja in peščenjaka — daje tamkajšnjim vinom električno mineralnost, ki je ni mogoče posnemati nikjer na svetu. Med Julijskimi Alpami na severu in toplim jadranskim suhim vetrom z juga Rebula počasi dozori na neznosno strmih pobočjih, obrana ročno, in ustvari vina kristalne natančnosti in globine.",
+    d_vipava: "Vipavsko dolino oblikuje veter. <em>Burja</em> — silovit severovzhodni vihar, ki lahko piha s 120 km/h in desetkrat letno preseka dolino — odganja bolezni, koncentrira okuse in določa karakter vsake steklenice, narejene tukaj. Trta raste nizko, korenine segajo petnajst metrov globoko v flišna tla po vodo in minerale. Rezultat so vina presenetljive čistosti: bele mešanice Zelena, Pinele, Malvazije in Rebule, ki hkrati nosijo svežino Alp in toplino Jadrana.",
+    d_kras: "Beseda <em>kras</em> — ki se danes uporablja po vsem svetu za opis apnenčastih pokrajin — izvira prav od tod. Na tem skalnatem planotu nad Tržaškim zalivom belo apnenčasto podlago pokriva plast z železom bogata rdeča prst barve suhe krvi: <em>terra rossa</em>. Iz nje nastane Teran, eno najstarejših in najzaščitenejših slovenskih vin — globoko rubinasto-skoraj-črno rdeče z visoko kislostjo, aromami divjih jagodičevij in železno-mineralnim oprijemom, ki se zdi, kot bi pil samo zemljo.",
+    d_istra: "Najtoplejši slovenski vinogradi gledajo na Jadran. Tri vetrovi izmenjaje oblikujejo rastno sezono: mrzla <em>Burja</em>, topli <em>Jugo</em> in s soljo napolnjeni <em>Maestral</em> z morja. Tu vlada Refošk — sorta žive češnjeve barve, čvrste kislosti in karakterja, ki se na obali kaže bogato in žametno, le nekaj kilometrov v notranjosti pa temnejše in bolj divje. In potem je tu Malvazija — kraljica istrskih belih vin — ki prihaja z akacijevim cvetom, citrusi in grenko mandljevino.",
+    d_staj: "Največji slovenski vinorodni okoliš — skoraj 40% vse nacionalne pridelave — leži tam, kjer se hladni Pohorski hribi srečajo s toplim dihom Panonske nižine. Strmi terasasti vinogradi na 350–600 metrih dajejo bela vina izjemne aromatične natančnosti in naravne svežine. Sauvignon Blanc tu razvije živahen, zeliščni karakter; Šipon (Furmint) doseže pristno kompleksnost. In tu stoji <em>Stara trta</em> v Mariboru — trs, star več kot 450 let, vpisan v Guinnessovo knjigo rekordov kot najstarejša vinska trta na svetu. Še vedno rodi grozdje. Še vedno daje vino.",
+    d_prek: "Prekmurje, ki se stiska v severovzhodnem kotu Slovenije med reko Muro in madžarsko mejo, je pokrajina zase — ravna, tiha, brez naglice, z vulkanskimi tlemi in globoko celinskim podnebjem vročih poletij in mrzlih zim. Madžarske vinogradniške tradicije prehajajo čez mejo; prav tako okus za Welschriesling, Chardonnay in Modro Frankinjo z resnično globino. Majhna pridelava, nizek profil, enkraten karakter.",
+    d_dol: "Rojstni kraj <em>Cvička</em> — slovenskega vina z največ karakterja in enega najnenavadnejših v vsej Evropi. Bledo rubinasta mešanica rdečih in belih sort, lahka, visoko kislinasta, nizko alkoholna in povsem iskrena v tem, kar je: vino, narejeno za hrano in družbo. Rahlo valoviti griči Dolenjske, ohlajeni z alpskimi vplivi, dajejo vina, katerih Cviček uživa zaščiteno geografsko označbo — ker ga pač ni mogoče narediti nikjer drugje.",
+    d_biz: "Med rekama Savo in Sotlo leži pokrajina, ki je drugačna od vsega v Sloveniji — vinogradi, zaščiteni pred ostrimi severnimi vetrovi z nizkimi gorami, in pod zemljo izjemno omrežje ročno izkopanih kleti, imenovanih <em>repnice</em>, vklesanih v mehek peščenjak za shranjevanje vina pri popolni naravni temperaturi. Modra Frankinja iz tega okoliša je prepotovala dolgo pot: strukturirana, začinjena in tiho impresivna. Okoliš gradi tudi sloves za peneča vina po tradicionalni metodi.",
+    d_bela: "Najmanjši slovenski vinorodni okoliš leži na skrajnem jugu, kjer Gorjanci dajejo prostor toplim apnenčastim ravninam in prvi vdih jadranskega toplega zraka doseže celinsko Posavje. Temperaturni nihaji med dnem in nočjo so dramatični — kar za vino pomeni eno: izjemno aromatično intenzivnost in svežino, ohranjeno v vsaki steklenici. Bela krajina je naredila prvo ledeno vino in prvi rosé v Sloveniji. Njena Modra Frankinja in Rumeni Muškat sta značilnosti okoliša.",
+    cta_title: "Pripravljeni na degustacijo?",
+    cta_sub: "Rezervirajte degustacijo v zgodovinski kleti v srcu Bleda.",
+    cta_btn: "Rezervirajte degustacijo",
+  },
+  de: {
+    nav_back: "← Zurück zu Weine",
+    eyebrow: "Weinregionen Sloweniens",
+    page_title: "Neun Bezirke,<br><em>ein Land.</em>",
+    page_intro: "Von den sonnenverwöhnten Hügeln der Goriška Brda bis zu den kühlen Terrassenweingärten der Štajerska — Slowenien vereint auf der Fläche einer kleinen italienischen Provinz eine außergewöhnliche Vielfalt an Terroirs. Drei Makroregionen, neun Bezirke — jeder geprägt durch Boden, Wind und Winzertradition.",
+    r01: 'Primorska', r01_sub: "Mediterran · 4 Bezirke · ~6.400 ha",
+    r02: 'Podravje',  r02_sub: "Kontinental · 2 Bezirke · ~5.850 ha",
+    r03: 'Posavje',   r03_sub: "Kontinental · 3 Bezirke · ~2.650 ha",
+    grapes: "Charakteristische Rebsorten",
+    wm_title_brda: "Unsere Winzer aus Goriška Brda",
+    wm_title_vipava: "Unsere Winzer aus dem Vipava-Tal",
+    wm_title_kras: "Unsere Winzer aus dem Kras",
+    wm_title_istra: "Unsere Winzer aus der Slowenischen Istrien",
+    wm_title_staj: "Unsere Winzer aus der Štajerska",
+    wm_title_prek: "Unsere Winzer aus Prekmurje",
+    wm_title_dol: "Unsere Winzer aus Dolenjska",
+    wm_title_biz: "Unsere Winzer aus Bizeljsko-Sremič",
+    wm_title_bela: "Unsere Winzer aus Bela krajina",
+    wm_empty: "— wird ergänzt —",
+    d_brda: "Man nennt es das slowenische Toskana — und wenn man die terrassierten Hügel bis zur italienischen Grenze sieht, versteht man warum. Aber Brda ist sein ganz eigenes Ding. Der legendäre <em>Opoka</em>-Boden — uralter Flysch aus abwechselnden Lagen von Mergel und Sandstein — verleiht den Weinen hier eine elektrisierende Mineralität, die nirgendwo sonst auf der Welt zu finden ist. Zwischen den Julischen Alpen im Norden und dem warmen Adriahauch aus dem Süden reift die Rebula langsam an unmöglich steilen Hängen und ergibt Weine von kristalliner Präzision und Tiefe.",
+    d_vipava: "Das Vipava-Tal wird vom Wind geprägt. Die <em>Burja</em> — ein heftiger Nordostwind, der bis zu zehnmal im Jahr mit 120 km/h durch das Tal fegen kann — hält Krankheiten fern, konzentriert die Aromen und definiert den Charakter jeder hier hergestellten Flasche. Die Reben wachsen bodennah, die Wurzeln bohren sich fünfzehn Meter tief in Flyschböden. Das Ergebnis sind Weine von überraschender Reinheit: weiße Cuvées aus Zelen, Pinela, Malvasia und Rebula, die gleichzeitig die Frische der Alpen und die Wärme der Adria tragen.",
+    d_kras: "Das Wort <em>Karst</em> — weltweit zur Beschreibung von Kalksteinlandschaften verwendet — wurde hier geprägt. Auf diesem rauen Plateau über dem Golf von Triest liegt über dem weißen Kalksteinuntergrund eine eisenreiche rote Erde, so gefärbt wie getrocknetes Blut: <em>terra rossa</em>. Aus ihr entsteht Teran, einer der ältesten und geschütztesten Weine Sloweniens — ein tiefes, fast schwarzes Rubin mit hoher Säure, wilden Beerennoten und einem eisen-mineralischen Griff, der sich anfühlt, als würde man das Land selbst trinken.",
+    d_istra: "Sloweniens wärmste Weinberge blicken auf die Adria hinaus. Drei Winde prägen abwechselnd die Vegetationsperiode: die kalte <em>Burja</em>, die warme <em>Jugo</em> und die salzige <em>Maestral</em> vom Meer. Hier ist Refošk König — eine Rebsorte mit leuchtend kirschroter Farbe, fester Säure und einem Charakter, der von reich und samtig an der Küste zu dunkler und wilder einige Kilometer landeinwärts wechselt. Und dann ist da die Malvasia — Königin der istrischen Weißweine — mit Akazienblüte, Zitrus und bitterer Mandel.",
+    d_staj: "Sloweniens größter Weinbaubezirk — fast 40% der gesamten nationalen Produktion — liegt dort, wo die kühlen Pohorje-Hügel auf den warmen Atem der Pannonischen Ebene treffen. Steile Terrassenweingärten auf 350–600 Metern erzeugen Weißweine von bemerkenswerter Aromatik und natürlicher Frische. Sauvignon Blanc entwickelt hier lebendige Kräuternoten; Šipon (Furmint) erreicht echte Komplexität. Und hier steht die <em>Stara trta</em> in Maribor — ein über 450 Jahre alter Weinstock, vom Guinness-Buch als ältester der Welt zertifiziert. Bringt noch immer Trauben. Macht noch immer Wein.",
+    d_prek: "Prekmurje, eingeklemmt in Sloweniens nordöstlicher Ecke zwischen dem Fluss Mura und der ungarischen Grenze, ist eine Welt für sich — flach, ruhig, ungehetzt, mit Vulkanböden und einem tief kontinentalen Klima mit heißen Sommern und kalten Wintern. Ungarische Weinbautraditionen fließen über die Grenze; ebenso eine Vorliebe für Welschriesling, Chardonnay und Blaufränkisch mit echter Tiefe. Kleine Produktion, niedriges Profil, unverwechselbarer Charakter.",
+    d_dol: "Die Heimat des <em>Cviček</em> — Sloweniens charakterstärksten traditionellen Weins und einem der ungewöhnlichsten in ganz Europa. Ein blassrubinfarbener Verschnitt aus roten und weißen Rebsorten, leicht im Körper, hoch in der Säure, niedrig im Alkohol und völlig ehrlich in dem, was er ist: ein Wein für Essen und Gesellschaft. Die sanft gewellten Hügel der Dolenjska produzieren Weine, deren Cviček geografisch geschützt ist — weil er schlicht nirgendwo sonst hergestellt werden kann.",
+    d_biz: "Zwischen den Flüssen Sava und Sotla liegt eine Landschaft, die in Slowenien einzigartig ist — Weinberge, geschützt vor harschen Nordwinden durch niedrige Berge, und unter der Erde ein außergewöhnliches Netz handgegrabener Höhlen namens <em>Repnice</em>, in weichen Sandstein gehauen, um Wein bei perfekter natürlicher Temperatur zu lagern. Der Blaufränkisch dieses Bezirks hat einen langen Weg zurückgelegt: strukturiert, würzig und leise beeindruckend. Der Bezirk baut auch einen Ruf für Schaumweine nach traditioneller Methode auf.",
+    d_bela: "Sloweniens kleinster Weinbaubezirk liegt im äußersten Süden, wo die Gorjanci-Hügel warmen Kalksteinebenen weichen und die ersten Hauch adriatischer Wärme das kontinentale Posavje erreichen. Die Temperaturschwankungen zwischen Tag und Nacht sind dramatisch — was für den Wein eines bedeutet: außergewöhnliche aromatische Intensität und Frische. Bela Krajina produzierte den ersten Eiswein und den ersten Rosé Sloweniens. Sein Blaufränkisch und Gelber Muskateller sind die Signaturen des Bezirks.",
+    cta_title: "Bereit zum Verkosten?",
+    cta_sub: "Buchen Sie eine Verkostung in unserem historischen Keller im Herzen von Bled.",
+    cta_btn: "Verkostung buchen",
+  },
+  it: {
+    nav_back: "← Torna ai vini",
+    eyebrow: "Regioni vinicole della Slovenia",
+    page_title: "Nove distretti,<br><em>un paese.</em>",
+    page_intro: "Dalle colline assolate di Goriška Brda ai freschi vigneti terrazzati della Štajerska — la Slovenia racchiude in uno spazio piccolo come una provincia italiana una varietà di terroir straordinaria. Tre macro-regioni, nove distretti — ognuno plasmato dal proprio suolo, vento e tradizione.",
+    r01: 'Primorska', r01_sub: "Mediterranea · 4 distretti · ~6.400 ha",
+    r02: 'Podravje',  r02_sub: "Continentale · 2 distretti · ~5.850 ha",
+    r03: 'Posavje',   r03_sub: "Continentale · 3 distretti · ~2.650 ha",
+    grapes: "Vitigni tipici",
+    wm_title_brda: "I nostri produttori da Goriška Brda",
+    wm_title_vipava: "I nostri produttori dalla Valle del Vipacco",
+    wm_title_kras: "I nostri produttori dal Carso",
+    wm_title_istra: "I nostri produttori dall'Istria Slovena",
+    wm_title_staj: "I nostri produttori dalla Štajerska",
+    wm_title_prek: "I nostri produttori da Prekmurje",
+    wm_title_dol: "I nostri produttori da Dolenjska",
+    wm_title_biz: "I nostri produttori da Bizeljsko-Sremič",
+    wm_title_bela: "I nostri produttori da Bela krajina",
+    wm_empty: "— da aggiungere —",
+    d_brda: "La chiamano la Toscana slovena — e quando si vedono le colline terrazzate che si estendono verso il confine italiano, si capisce perché. Ma Brda è una cosa tutta sua. Il leggendario terreno <em>opoka</em> — antico flysch compresso in strati alternati di marna e arenaria — conferisce ai vini qui una mineralità elettrizzante che nessun altro luogo al mondo può replicare. Tra le Alpi Giulie a nord e il respiro caldo dell\'Adriatico a sud, la Rebula matura lentamente su pendii impossibilmente ripidi, raccolta a mano, e produce vini di precisione cristallina e profondità.",
+    d_vipava: "La Valle del Vipacco è plasmata dal vento. La <em>Burja</em> — un feroce vento di bora che può attraversare la valle a 120 km/h fino a dieci volte l\'anno — allontana le malattie, concentra i sapori e definisce il carattere di ogni bottiglia prodotta qui. Le viti crescono rasoterra, le radici si infilano quindici metri in profondità nei suoli di flysch. Il risultato sono vini di sorprendente purezza: bianchi di Zelen, Pinela, Malvasia e Rebula che portano contemporaneamente la freschezza delle Alpi e il calore dell\'Adriatico.",
+    d_kras: "La parola <em>carso</em> — usata in tutto il mondo per descrivere i paesaggi calcarei — è nata qui. Su questo altopiano aspro sopra il Golfo di Trieste, il substrato calcareo bianco è ricoperto da uno strato di suolo rosso ricco di ferro, del colore del sangue essiccato: <em>terra rossa</em>. Da essa nasce il Teran, uno dei vini più antichi e protetti della Slovenia — un rosso rubino quasi nero con acidità elevata, aromi di bacche selvatiche e una presa ferro-minerale che sembra di bere la terra stessa.",
+    d_istra: "I vigneti più caldi della Slovenia guardano sull\'Adriatico. Tre venti si alternano nel plasmare la stagione vegetativa: la fredda <em>Burja</em>, il caldo <em>Jugo</em>, e il salato <em>Maestral</em> dal mare. Qui il Refošk è re — un vitigno di vivace color ciliegia, acidità ferma e un carattere che passa da ricco e vellutato sulla costa a più scuro e selvatico pochi chilometri nell\'entroterra. E poi c\'è la Malvasia — regina dei bianchi istriani — che arriva con fiori di acacia, agrumi e mandorla amara.",
+    d_staj: "Il distretto vinicolo più grande della Slovenia — quasi il 40% di tutta la produzione nazionale — si trova dove le fresche colline del Pohorje incontrano il caldo respiro della Pianura Pannonica. I ripidi vigneti terrazzati a 350–600 metri producono bianchi di notevole precisione aromatica e freschezza naturale. Il Sauvignon Blanc qui sviluppa un carattere vivace ed erbaceo; lo Šipon (Furmint) raggiunge vera complessità. E qui si trova la <em>Stara trta</em> a Maribor — una singola vite di oltre 450 anni, certificata dal Guinness come la più vecchia del mondo. Produce ancora uva. Fa ancora vino.",
+    d_prek: "Incastrato nell\'angolo nordorientale della Slovenia, tra il fiume Mura e il confine ungherese, il Prekmurje è un mondo a parte — piatto, quieto, senza fretta, con suoli vulcanici e un clima profondamente continentale con estati calde e inverni freddi. Le tradizioni vitivinicole ungheresi varcano il confine; così il gusto per Welschriesling, Chardonnay e Blaufränkisch con vera profondità. Piccola produzione, basso profilo, carattere inconfondibile.",
+    d_dol: "La patria del <em>Cviček</em> — il vino tradizionale più caratteristico della Slovenia e uno dei più insoliti d\'Europa. Un blend rosato pallido di uve rosse e bianche, leggero nel corpo, alta acidità, basso alcol, totalmente onesto su ciò che è: un vino fatto per il cibo e la compagnia. Le dolci colline della Dolenjska producono vini il cui Cviček è protetto geograficamente — perché semplicemente non può essere prodotto altrove.",
+    d_biz: "Tra i fiumi Sava e Sotla si trova un paesaggio unico in Slovenia — vigneti protetti dai venti nordici da basse montagne, e sotto terra una straordinaria rete di cantine scavate a mano chiamate <em>repnice</em>, ricavate nella morbida arenaria per conservare il vino alla temperatura naturale perfetta. Il Blaufränkisch di questo distretto ha fatto molta strada: strutturato, speziato e silenziosamente impressionante. Il distretto sta costruendo anche una reputazione per i vini spumanti metodo classico.",
+    d_bela: "Il distretto vinicolo più piccolo della Slovenia si trova nel profondo sud, dove le colline Gorjanci cedono il passo a calde pianure calcaree. Le escursioni termiche tra giorno e notte sono drammatiche — il che significa una cosa per il vino: straordinaria intensità aromatica e freschezza preservata in ogni bottiglia. La Bela Krajina ha prodotto il primo vino di ghiaccio e il primo rosé della Slovenia. Il suo Blaufränkisch e il Gelber Muskateller sono le firme del distretto.",
+    cta_title: "Pronti ad assaggiare?",
+    cta_sub: "Prenota una degustazione nella nostra cantina storica nel cuore di Bled.",
+    cta_btn: "Prenota una degustazione",
+  },
+  ru: {
+    nav_back: "← Назад к винам",
+    eyebrow: "Винные регионы Словении",
+    page_title: "Девять районов,<br><em>одна страна.</em>",
+    page_intro: "От залитых солнцем холмов Горишка Брда до прохладных террасных виноградников Штаерской — Словения умещает на территории небольшой итальянской провинции поразительное разнообразие терруаров. Три макрорегиона, девять районов — каждый сформирован своей почвой, ветром и традицией виноделия.",
+    r01: 'Приморская', r01_sub: "Средиземноморский · 4 района · ~6 400 га",
+    r02: 'Подравье',   r02_sub: "Континентальный · 2 района · ~5 850 га",
+    r03: 'Посавье',    r03_sub: "Континентальный · 3 района · ~2 650 га",
+    grapes: "Характерные сорта",
+    wm_title_brda: "Наши виноделы из Горишка Брда",
+    wm_title_vipava: "Наши виноделы из долины Випава",
+    wm_title_kras: "Наши виноделы из Карста",
+    wm_title_istra: "Наши виноделы из Словенской Истрии",
+    wm_title_staj: "Наши виноделы из Штаерской",
+    wm_title_prek: "Наши виноделы из Прекмурья",
+    wm_title_dol: "Наши виноделы из Доленьской",
+    wm_title_biz: "Наши виноделы из Бизельско-Шремич",
+    wm_title_bela: "Наши виноделы из Бела Краина",
+    wm_empty: "— будет добавлено —",
+    d_brda: "Её называют словенской Тосканой — и когда видишь террасные холмы, уходящие к итальянской границе, понимаешь почему. Но Брда — совершенно самостоятельная история. Легендарная почва <em>опока</em> — древний флиш, сжатый в чередующиеся слои мергеля и песчаника — придаёт здешним винам электрическую минеральность, которую невозможно воспроизвести нигде в мире. Между Юлийскими Альпами на севере и тёплым дыханием Адриатики с юга Ребула медленно созревает на невозможно крутых склонах, собирается вручную и рождает вина кристальной точности и глубины.",
+    d_vipava: "Долину Випава формирует ветер. <em>Бурья</em> — яростный северо-восточный шквал, способный пронестись по долине со скоростью 120 км/ч до десяти раз в год — отгоняет болезни, концентрирует вкусы и определяет характер каждой сделанной здесь бутылки. Лоза растёт низко над землёй, корни уходят на пятнадцать метров вглубь флишевых почв в поисках воды и минералов. Результат — вина удивительной чистоты: белые ассамбляжи из Зелена, Пинелы, Мальвазии и Ребулы, несущие одновременно свежесть Альп и тепло Адриатики.",
+    d_kras: "Слово <em>карст</em> — используемое во всём мире для описания известняковых ландшафтов — родилось именно здесь. На этом суровом плато над Триестским заливом белую известняковую породу укрывает слой богатой железом красной почвы цвета засохшей крови: <em>terra rossa</em>. Из неё рождается Теран — одно из старейших и наиболее защищённых словенских вин: тёмно-рубиновое, почти чёрное, с высокой кислотностью, ароматами дикой ягоды и железно-минеральным охватом, словно пьёшь саму землю. В XVI веке продавалось в венских аптеках как средство от анемии.",
+    d_istra: "Самые тёплые словенские виноградники смотрят на Адриатику. Три ветра по очереди формируют вегетационный сезон: холодная <em>Бурья</em>, тёплый <em>Юго</em> и напоённый солью <em>Маэстраль</em> с моря. Здесь правит Рефошк — сорт яркого вишнёвого цвета, с твёрдой кислотностью и характером, который у берега богатый и бархатистый, а в нескольких километрах вглубь — темнее и диче. И есть Мальвазия — королева истрийских белых — с акациевым цветом, цитрусами и горьким миндалём.",
+    d_staj: "Крупнейший винодельческий район Словении — почти 40% всего национального производства — расположен там, где прохладные холмы Похорье встречают тёплое дыхание Паннонской равнины. Крутые террасные виноградники на высоте 350–600 метров дают белые вина замечательной ароматической точности и природной свежести. Совиньон Блан здесь развивает живой, травянистый характер; Шипон (Фурминт) достигает подлинной сложности. А в Мариборе стоит <em>Стара трта</em> — виноградная лоза возрастом более 450 лет, внесённая в Книгу рекордов Гиннесса как старейшая в мире. Всё ещё даёт ягоды. Всё ещё делает вино.",
+    d_prek: "Прекмурье, зажатое в северо-восточном углу Словении между рекой Мура и венгерской границей — особый мир: плоский, тихий, неторопливый, с вулканическими почвами и глубоко континентальным климатом жарких лет и холодных зим. Венгерские традиции виноделия перетекают через границу; вместе с ними — вкус к Велшрислингу, Шардоне и Блауфрэнкишу с настоящей глубиной. Малое производство, низкий профиль, неповторимый характер.",
+    d_dol: "Родина <em>Цвичека</em> — самого характерного традиционного вина Словении и одного из самых необычных во всей Европе. Бледно-рубиновое купажное вино из красных и белых сортов, лёгкое телом, с высокой кислотностью, низким алкоголем и полной честностью о том, что оно есть: вино для еды и компании. Мягко холмистая Доленьская, охлаждённая альпийскими влияниями, производит Цвичек с защищённым географическим указанием — потому что сделать его в другом месте просто невозможно.",
+    d_biz: "Между реками Сава и Сотла лежит ландшафт, не похожий ни на что в Словении — виноградники, защищённые от холодных северных ветров низкими горами, и под землёй — удивительная сеть вручную вырытых погребов <em>репница</em>, выдолбленных в мягком песчанике для хранения вина при идеальной естественной температуре. Блауфрэнкиш из этого района прошёл долгий путь: структурированный, пряный и тихо впечатляющий. Район также строит репутацию для игристых вин традиционного метода.",
+    d_bela: "Наименьший винодельческий район Словении лежит на крайнем юге, где холмы Горьянци уступают место тёплым известняковым равнинам и первые дуновения адриатического тепла достигают континентального Посавья. Температурные перепады между днём и ночью здесь значительны — а для вина это означает одно: исключительную ароматическую интенсивность и свежесть в каждой бутылке. Бела Краина сделала первое ледяное вино и первый розе в Словении.",
+    cta_title: "Готовы к дегустации?",
+    cta_sub: "Забронируйте дегустацию в нашем историческом погребе в самом сердце Бледа.",
+    cta_btn: "Забронировать дегустацию",
+  },
+  zh: {
+    nav_back: "← 返回葡萄酒",
+    eyebrow: "斯洛文尼亚葡萄酒产区",
+    page_title: "九个产区，<br><em>一个国家。</em>",
+    page_intro: "从阳光灿烂的戈里什卡布尔达丘陵到凉爽的斯塔耶尔斯卡梯田葡萄园——斯洛文尼亚在一个意大利小省大小的土地上，汇聚了令人惊叹的风土多样性。三大宏观区域，九个产区，每一个都由自己的土壤、风和酿酒传统塑造。",
+    r01: '滨海区', r01_sub: "地中海气候 · 4个产区 · 约6,400公顷",
+    r02: '德拉瓦区', r02_sub: "大陆气候 · 2个产区 · 约5,850公顷",
+    r03: '萨瓦区', r03_sub: "大陆气候 · 3个产区 · 约2,650公顷",
+    grapes: "特色葡萄品种",
+    wm_title_brda: "我们来自戈里什卡布尔达的酿酒师",
+    wm_title_vipava: "我们来自维帕瓦河谷的酿酒师",
+    wm_title_kras: "我们来自喀斯特的酿酒师",
+    wm_title_istra: "我们来自斯洛文尼亚伊斯特拉的酿酒师",
+    wm_title_staj: "我们来自斯塔耶尔斯卡的酿酒师",
+    wm_title_prek: "我们来自普雷克穆列的酿酒师",
+    wm_title_dol: "我们来自多连斯卡的酿酒师",
+    wm_title_biz: "我们来自比泽利斯科-斯雷米奇的酿酒师",
+    wm_title_bela: "我们来自贝拉克拉伊纳的酿酒师",
+    wm_empty: "— 即将添加 —",
+    d_brda: "人们称它为斯洛文尼亚的托斯卡纳——当你看到那些向意大利边境延伸的梯田山丘，你就明白为什么了。但布尔达是完全独特的存在。传奇的<em>opoka</em>土壤——由泥灰岩和砂岩交替层压而成的古老复理石——赋予这里的葡萄酒一种世界上任何地方都无法复制的震撼矿物感。在北面的朱利安阿尔卑斯山与南面温暖的亚德里亚海之间，丽波拉在陡峭得近乎不可思议的山坡上缓慢成熟，全程手工采摘，酿成精准而深邃的佳酿。",
+    d_vipava: "维帕瓦河谷由风塑造。<em>布拉</em>——一种猛烈的东北风，每年可以十次以120公里/小时的速度穿越山谷——驱走病害，浓缩风味，定义了这里每一瓶酒的个性。葡萄藤贴地生长，根系深入复理石土壤十五米寻找水分和矿物质。结果是令人惊叹的纯净之酒：由泽伦、皮内拉、马尔瓦西亚和丽波拉混酿的白葡萄酒，同时承载着阿尔卑斯山的清新与亚德里亚海的温暖。",
+    d_kras: "世界上用来描述石灰岩地貌的词语<em>\"karst\"（喀斯特）</em>正是在这里诞生的。在的里雅斯特湾上方这片粗粝的高原上，白色石灰岩基岩覆盖着一层富含铁质的红色土壤，颜色如同干涸的血液：<em>terra rossa</em>。从中诞生了Teran——斯洛文尼亚最古老、保护最严格的葡萄酒之一：深宝石红近乎黑色，高酸度，野生浆果香气，铁矿物质的抓握感，仿佛饮下的是土地本身。16世纪时曾在维也纳药店作为贫血症药物销售。",
+    d_istra: "斯洛文尼亚最温暖的葡萄园俯瞰着亚德里亚海。三种风轮流塑造着生长季节：寒冷的<em>布拉</em>、温暖的<em>尤戈</em>，以及来自大海带着盐味的<em>马埃斯特拉尔</em>。这里雷福什克称王——一种鲜亮樱桃色、酸度坚实的葡萄品种，在海岸线上丰腴如丝绒，深入内陆几公里后则变得更深沉、更狂野。然后是玛尔瓦西亚——伊斯特拉白葡萄酒的女王——带着金合欢花、柑橘和苦杏仁的香气而来，一款闻起来像地中海夏天的葡萄酒。",
+    d_staj: "斯洛文尼亚最大的葡萄酒产区——占全国总产量近40%——坐落在凉爽的波霍尔山与温暖的潘诺尼亚平原暖流交汇之处。350至600米海拔的陡峭梯田葡萄园出产的白葡萄酒，香气精准，天然清新。长相思在这里发展出活泼的草本特色；西庞（弗尔明特）达到真正的复杂度。而在马里博尔，矗立着<em>Stara trta</em>——一株超过450年树龄的葡萄藤，被吉尼斯认证为世界上最古老的葡萄藤。至今仍在结果。至今仍在酿酒。",
+    d_prek: "普雷克穆列藏在斯洛文尼亚东北角，夹在穆拉河与匈牙利边境之间，是一片与众不同的土地——平坦、安静、从容，拥有火山土壤和典型大陆性气候，夏季炎热，冬季寒冷。匈牙利的酿酒传统越境渗透；对威尔士雷司令、霞多丽和蓝弗兰克的偏爱也随之而来，这些品种在这里展现出真实的深度与结构。小规模产量，低调的存在，独一无二的个性。",
+    d_dol: "这里是<em>Cviček</em>的故乡——斯洛文尼亚个性最鲜明的传统葡萄酒，也是全欧洲最不寻常的葡萄酒之一。这是一款淡宝石红色的红白葡萄混酿，酒体轻盈，酸度高，酒精度低，对自己是什么毫不掩饰：一款为食物和陪伴而生的酒。多连斯卡温柔起伏的山丘拥有受地理标志保护的Cviček——因为这款酒简单地说，在其他任何地方都无法酿造。",
+    d_biz: "在萨瓦河与索特拉河之间，是一片在斯洛文尼亚独一无二的风景——葡萄园被低矮的山脉遮挡住凛冽的北风，而地下则藏着一个非凡的手工挖掘洞穴网络，称为<em>repnice</em>，刻入柔软的砂岩中，以完美的天然温度储存葡萄酒。这一产区的蓝弗兰克走过了漫长的道路：结构感强，辛香，低调而令人印象深刻。该产区也在传统法酿造的起泡酒方面建立起声誉。",
+    d_bela: "斯洛文尼亚最小的葡萄酒产区位于最南端，这里戈尔扬奇山渐渐让位于温暖的石灰岩平原，亚德里亚海的暖意第一次触及大陆性的波萨夫耶。昼夜温差极大——这对葡萄酒意味着一件事：非凡的香气强度和保存在每一瓶酒中的清新感。贝拉克拉伊纳酿造了斯洛文尼亚第一款冰酒和第一款桃红葡萄酒。其蓝弗兰克和黄麝香是该产区的标志性品种。",
+    cta_title: "准备好品酒了吗？",
+    cta_sub: "在布莱德历史酒窖预订一次品酒体验。",
+    cta_btn: "预订品酒",
+  }
+};
+
+// Add data-i18n attributes via JS on load
+function applyLang(l) {
+  const t = T[l] || T.en;
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === l);
+  });
+  localStorage.setItem('vb_lang', l);
+}
+
+// Read saved language on load
+document.addEventListener('DOMContentLoaded', function() {
+  const saved = localStorage.getItem('vb_lang') || 'en';
+  applyLang(saved);
+});
+</script>
+</body>
+</html>
