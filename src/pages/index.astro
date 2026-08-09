@@ -1,11 +1,890 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { getCounts } from '../lib/sanity.js';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+let counts = { winemakers: 17, wines: 56, regions: 9 };
+try {
+  counts = await getCounts();
+} catch(e) {
+  console.error('Sanity fetch error:', e);
+}
 ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vino Bled — Slovenia Wine Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
 
-<Layout>
-	<Welcome />
-</Layout>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a1410;--bg2:#221c15;--bg3:#2a221a;
+  --cream:#f0e8d8;--cream-dim:#bfb5a0;
+  --terra:#c4613a;--ochre:#c49a3a;--olive:#6b7a42;
+  --border:rgba(232,224,208,0.12);--border2:rgba(232,224,208,0.25);
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.7;overflow-x:hidden}
+.lang-bar{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:flex-end;align-items:center;padding:.4rem 3rem;background:rgba(26,20,16,.97);border-bottom:1px solid var(--border);gap:.25rem}
+.lang-btn{font-family:var(--sans);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cream-dim);background:transparent;border:none;padding:.3rem .6rem;cursor:pointer;border-radius:2px;transition:color .2s,background .2s}
+.lang-btn:hover{color:var(--cream)}
+.lang-btn.active{color:var(--terra);background:rgba(196,97,58,.1)}
+.lang-sep{color:var(--border2);font-size:.7rem}
+nav{position:fixed;top:30px;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 3rem;border-bottom:1px solid transparent;transition:background .4s,border-color .4s}
+nav.scrolled{background:rgba(26,20,16,.92);border-color:var(--border);backdrop-filter:blur(12px)}
+.nav-logo{font-family:var(--serif);font-size:1.1rem;font-weight:400;letter-spacing:.08em;color:var(--cream);text-decoration:none}
+.nav-logo span{color:var(--terra)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-dim);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--cream)}
+.nav-cta{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--bg);background:var(--terra);padding:.55rem 1.4rem;border-radius:2px;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:var(--ochre)}
+#hero{min-height:100vh;display:flex;align-items:center;padding:100px 3rem 5rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(to right,rgba(26,20,16,.82) 0%,rgba(26,20,16,.55) 50%,rgba(26,20,16,.35) 100%),url(images/hero.jpg) center/cover no-repeat}
+.hero-line{position:absolute;left:3rem;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--border2) 30%,var(--border2) 70%,transparent)}
+.hero-content{position:relative;max-width:680px}
+.hero-eyebrow{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--terra);margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
+.hero-eyebrow::before{content:'';display:block;width:2rem;height:1px;background:var(--terra)}
+.hero-title{font-family:var(--serif);font-size:clamp(2.8rem,6vw,5.5rem);font-weight:300;line-height:1.05;color:var(--cream);margin-bottom:1.5rem}
+.hero-title em{font-style:italic;color:var(--cream-dim)}
+.hero-sub{font-size:1rem;color:var(--cream-dim);max-width:460px;margin-bottom:2.5rem;line-height:1.75}
+.hero-actions{display:flex;gap:1rem;align-items:center}
+.btn-primary{font-family:var(--sans);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--terra);padding:.85rem 2rem;border-radius:2px;text-decoration:none;border:none;cursor:pointer;transition:background .2s;display:inline-block}
+.btn-primary:hover{background:var(--ochre)}
+.btn-ghost{font-family:var(--sans);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cream-dim);background:transparent;padding:.85rem 2rem;border-radius:2px;text-decoration:none;border:1px solid var(--border2);cursor:pointer;transition:color .2s,border-color .2s;display:inline-block}
+.btn-ghost:hover{color:var(--cream);border-color:rgba(232,224,208,.5)}
+.hero-scroll{position:absolute;right:3rem;bottom:3rem;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cream-dim);writing-mode:vertical-rl;display:flex;align-items:center;gap:.75rem}
+.hero-scroll::after{content:'';display:block;width:1px;height:3rem;background:linear-gradient(to bottom,var(--cream-dim),transparent)}
+section{padding:4rem 3rem}
+.section-label{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--terra);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.section-label::before{content:'';display:block;width:1.5rem;height:1px;background:var(--terra)}
+h2{font-family:var(--serif);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;line-height:1.15;color:var(--cream);margin-bottom:1.5rem}
+h2 em{font-style:italic;color:var(--cream-dim)}
+.divider{border:none;border-top:1px solid var(--border);margin:0}
+#concept{background:var(--bg2)}
+.concept-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:stretch}
+.concept-text p{font-size:1.05rem;color:var(--cream-dim);line-height:1.85;margin-bottom:1.25rem}
+.concept-text strong{color:var(--cream);font-weight:400}
+.concept-visual{position:relative;border-radius:2px;overflow:hidden;border:1px solid rgba(232,224,208,0.12);display:flex;flex-direction:column}
+.concept-visual img{width:100%;height:100%;display:block;object-fit:cover;flex:1;min-height:400px}
+.concept-stats{position:absolute;bottom:0;left:0;right:0;padding:2.5rem;display:flex;gap:0;background:linear-gradient(to top,rgba(18,11,6,0.85) 0%,transparent 100%)}
+.stat-item{flex:1;padding-right:1.5rem;border-right:1px solid rgba(232,224,208,0.15)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:'Cormorant Garamond',Georgia,serif;font-size:3.5rem;font-weight:300;color:#e8e0d0;line-height:1;display:block;margin-bottom:0.3rem}
+.stat-rule{width:2rem;height:1px;background:#c4613a;display:block;margin-bottom:0.5rem}
+.stat-label{font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;color:#a89e8a}
+.concept-img{background:var(--bg3);border:1px solid var(--border);border-radius:2px;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;color:var(--cream-dim);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:1rem}
+.concept-img.tall{grid-row:span 2;aspect-ratio:auto}
+#how{background:var(--bg)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:2px;margin-top:3rem;overflow:hidden}
+.step{padding:2.5rem 2rem;border-right:1px solid var(--border);transition:background .3s}
+.step:last-child{border-right:none}
+.step:hover{background:var(--bg2)}
+.step-num{font-family:var(--serif);font-size:4rem;font-weight:300;color:var(--border2);line-height:1;margin-bottom:1.5rem;transition:color .3s}
+.step:hover .step-num{color:var(--terra)}
+.step h3{font-family:var(--serif);font-size:1.25rem;font-weight:400;color:var(--cream);margin-bottom:.75rem}
+.step p{font-size:.88rem;color:var(--cream-dim);line-height:1.7}
+.how-cta{margin-top:2.5rem}
+#tastings{background:var(--bg2)}
+.tastings-intro{max-width:560px;color:var(--cream-dim);margin-bottom:3rem;font-size:1rem}
+.tastings-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:2.5rem}
+.tasting-card{background:var(--bg2);padding:2.5rem 2rem;display:flex;flex-direction:column;transition:background .3s}
+.tasting-card:hover,.tasting-card.featured{background:var(--bg3)}
+.tasting-tag{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);margin-bottom:1.25rem}
+.tasting-card h3{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--cream);margin-bottom:1rem;line-height:1.2}
+.tasting-card p{font-size:.88rem;color:var(--cream-dim);line-height:1.7;flex:1;margin-bottom:1.5rem}
+.tasting-theme{font-size:.8rem;color:var(--ochre);font-style:italic;font-family:var(--serif);margin-bottom:1rem}
+.tasting-meta{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.tasting-pill{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--cream-dim);border:1px solid var(--border2);padding:.25rem .65rem;border-radius:1px}
+.tasting-note{font-size:.75rem;color:rgba(168,158,138,.6)}
+.tasting-img{width:100%;height:200px;object-fit:cover;border-radius:2px;margin-bottom:1.5rem;display:block}
+.tasting-img-placeholder{width:100%;height:200px;border-radius:2px;margin-bottom:1.5rem;display:block;background:var(--bg)}
+#explore{background:var(--bg)}
+.explore-text{max-width:560px;color:var(--cream-dim);margin-bottom:3rem}
+.explore-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2.5rem}
+.explore-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;text-decoration:none;display:flex;flex-direction:row;overflow:hidden;transition:border-color .3s,background .3s}
+.explore-card-body{padding:1.25rem 2rem;flex:1;display:flex;flex-direction:column}
+.explore-card-img{width:45%;flex-shrink:0;position:relative;overflow:hidden;min-height:170px}
+.explore-card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.explore-card:hover .explore-card-img img{transform:scale(1.04)}
+.explore-card-img-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(26,20,16,.3) 0%,transparent 100%)}
+.explore-card:hover{border-color:var(--border2);background:var(--bg3)}
+.explore-icon{font-size:1.5rem;margin-bottom:1rem;color:var(--terra)}
+.explore-card h3{font-family:var(--serif);font-size:1.35rem;font-weight:400;color:var(--cream);margin-bottom:.5rem}
+.explore-card p{font-size:.85rem;color:var(--cream-dim);line-height:1.65}
+.explore-arrow{display:block;margin-top:auto;padding-top:1.25rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terra)}
+.region-group{margin-bottom:1rem}
+.region-group-title{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);margin-bottom:.4rem}
+.region-list{list-style:none;padding:0;margin:0}
+.region-list li{font-size:.8rem;color:var(--cream-dim);padding:.2rem 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+.region-list li::before{content:'';display:block;width:.35rem;height:.35rem;border-radius:50%;background:var(--terra);opacity:.6;flex-shrink:0}
+.region-list li:last-child{border-bottom:none}
+#history{background:var(--bg2)}
+.history-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.history-text p{font-size:1rem;color:var(--cream-dim);line-height:1.85;margin-bottom:1.5rem}
+.history-text strong{color:var(--cream);font-weight:400}
+.history-visuals{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:400px}
+.hist-img{background:var(--bg3);border:1px solid var(--border);border-radius:2px;display:flex;align-items:flex-end;padding:.75rem;color:rgba(168,158,138,.5);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;position:relative;overflow:hidden}
+.hist-img.tall{grid-row:span 2}
+.hist-img.span2{grid-column:span 2;min-height:200px}
+#gallery{background:var(--bg);padding-bottom:4rem}
+.gallery-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:220px 220px;gap:6px;margin-top:2rem;margin-bottom:3rem}
+.g-img{background:var(--bg2);border:1px solid var(--border);border-radius:2px}
+.g1{grid-column:span 5}.g2{grid-column:span 4}.g3{grid-column:span 3}
+.g4{grid-column:span 3}.g5{grid-column:span 5}.g6{grid-column:span 4}
+.sig{font-family:var(--serif);font-size:clamp(1.8rem,4vw,3rem);font-weight:300;font-style:italic;color:var(--cream-dim);text-align:center}
+#booking{background:var(--bg)}
+.booking-wrap{max-width:620px;margin:0 auto;text-align:center}
+.booking-wrap h2{text-align:center;margin-bottom:.75rem}
+.booking-sub{color:var(--cream-dim);margin-bottom:3rem;font-size:.95rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;text-align:left;margin-bottom:1rem}
+.form-field{display:flex;flex-direction:column;gap:.4rem}
+.form-field.full{grid-column:span 2}
+.form-field label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terra)}
+.form-field input,.form-field select,.form-field textarea{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:.75rem 1rem;color:var(--cream);font-family:var(--sans);font-size:.9rem;font-weight:300;outline:none;transition:border-color .2s;width:100%}
+.form-field select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a89e8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.6) sepia(0.3);cursor:pointer;opacity:0.7}
+input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
+.form-field select option{background:var(--bg2)}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--border2)}
+.form-field input::placeholder,.form-field textarea::placeholder{color:rgba(168,158,138,.4)}
+.form-submit{margin-top:1.5rem}
+.form-submit button{font-family:var(--sans);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:var(--terra);padding:1rem 3rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s}
+.form-submit button:hover{background:var(--ochre)}
+.form-note{margin-top:1rem;font-size:.75rem;color:rgba(168,158,138,.5)}
+.form-field input:invalid:not(:placeholder-shown),
+.form-field select:invalid:not([value=""]):required,
+.form-field input.touched:invalid,
+.form-field select.touched:invalid{border-color:#c4613a}
+.field-error{font-size:.65rem;color:#c4613a;margin-top:.3rem;display:none}
+.form-field input.touched:invalid ~ .field-error,
+.form-field select.touched:invalid ~ .field-error{display:block}
+#visit{background:var(--bg2)}
+.visit-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:5rem;align-items:start}
+.visit-sub-text{font-size:1rem;color:var(--cream-dim);line-height:1.75;margin-bottom:2rem}
+.visit-info{border-top:1px solid var(--border);margin-bottom:2.5rem}
+.visit-row{display:flex;border-bottom:1px solid var(--border);padding:1rem 0;gap:1.5rem}
+.visit-row-label{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--terra);min-width:100px;padding-top:.15rem}
+.visit-row-val{font-size:.9rem;color:var(--cream-dim);line-height:1.6}
+.visit-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.visit-map{background:var(--bg3);border:1px solid var(--border);border-radius:2px;min-height:380px;display:flex;align-items:center;justify-content:center;color:var(--cream-dim);font-size:.8rem;flex-direction:column;gap:.75rem;letter-spacing:.1em;text-transform:uppercase}
+footer{padding:2.5rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:var(--serif);font-size:1rem;color:var(--cream-dim)}
+.footer-logo span{color:var(--terra)}
+.footer-copy{font-size:.72rem;color:rgba(168,158,138,.4)}
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+@media(max-width:900px){
+  .lang-bar{padding:.4rem 1rem;flex-wrap:wrap;justify-content:center}
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  section{padding:4rem 1.5rem}
+  #hero{padding:80px 1.5rem 4rem}
+  .concept-grid,.history-grid,.visit-grid{grid-template-columns:1fr;gap:2.5rem}
+  .steps{grid-template-columns:1fr 1fr}
+  .step{border-right:none;border-bottom:1px solid var(--border)}
+  .step:nth-child(odd){border-right:1px solid var(--border)}
+  .step:last-child{border-bottom:none}
+  .tastings-grid,.explore-grid{grid-template-columns:1fr}
+  .gallery-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .g1,.g2,.g3,.g4,.g5,.g6{grid-column:span 1;height:140px}
+  .form-grid{grid-template-columns:1fr}
+  .form-field.full{grid-column:span 1}
+  footer{flex-direction:column;text-align:center}
+  .hero-scroll,.hero-line{display:none}
+}
+
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('en')">EN</button><span class="lang-sep">·</span>
+  <button class="lang-btn" onclick="setLang('sl')">SL</button><span class="lang-sep">·</span>
+  <button class="lang-btn" onclick="setLang('de')">DE</button><span class="lang-sep">·</span>
+  <button class="lang-btn" onclick="setLang('it')">IT</button><span class="lang-sep">·</span>
+  <button class="lang-btn" onclick="setLang('ru')">RU</button><span class="lang-sep">·</span>
+  <button class="lang-btn" onclick="setLang('zh')">中文</button>
+</div>
+<nav id="nav">
+  <a href="#" class="nav-logo">Vino <span>Bled</span></a>
+  <ul class="nav-links">
+    <li><a href="#concept" data-i18n="nav_about">About</a></li>
+    <li><a href="#tastings" data-i18n="nav_tastings">Tastings</a></li>
+    <li><a href="#explore" data-i18n="nav_wines">Wines</a></li>
+    <li><a href="#visit" data-i18n="nav_visit">Visit</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta" data-i18n="nav_book">Book a tasting</a>
+</nav>
+<section id="hero">
+  <div class="hero-bg"></div><div class="hero-line"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" data-i18n="hero_eyebrow">Slovenia Wine Experience</div>
+    <h1 class="hero-title" data-i18n="hero_title">The wines<br>of Slovenia,<br><em>in one cellar.</em></h1>
+    <p class="hero-sub" data-i18n="hero_sub">Discover Slovenian wine regions, taste selected wines and find the ones you truly enjoy — in a historic cellar in the heart of Bled.</p>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-primary" data-i18n="btn_book">Book a tasting</a>
+      <a href="#explore" class="btn-ghost" data-i18n="btn_explore">Explore wines</a>
+    </div>
+  </div>
+  <div class="hero-scroll" data-i18n="scroll">Scroll</div>
+</section>
+<hr class="divider">
+<section id="concept">
+  <div class="concept-grid">
+    <div class="concept-text fade-in">
+      <div class="section-label" data-i18n="concept_label">The story</div>
+      <h2 data-i18n="concept_title">Where wine becomes a <em>language.</em></h2>
+      <p data-i18n="concept_p1">In a historic cellar in the heart of Bled — where wine was once made for the guests of this famous resort — a new space has been born, dedicated to the wine terroirs of Slovenia.</p>
+      <p data-i18n="concept_p2">These walls remember generations of travellers for whom Bled was and remains a symbol of hospitality. Today, instead of industrial production, <strong>independent winemakers</strong> whose wines reflect the character of their lands are gathered here.</p>
+      <p data-i18n="concept_p3">Vino Bled brings together the wine regions of Slovenia, the people behind them, their stories and their craft. A journey through the country — from alpine hills to the Mediterranean coast — without leaving the cellar.</p>
+      <p data-i18n="concept_p4">Here, wine is the language in which Slovenia tells its story to its guests.</p>
+    </div>
+    <div class="concept-visual fade-in d2">
+      <img src="images/concept.jpg" alt="Wine glass in cellar">
+      <div class="concept-stats">
+        <div class="stat-item">
+          <span class="stat-num">17</span>
+          <span class="stat-rule"></span>
+          <span class="stat-label" data-i18n="stat_winemakers">Winemakers</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">9</span>
+          <span class="stat-rule"></span>
+          <span class="stat-label" data-i18n="stat_regions">Regions</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">56</span>
+          <span class="stat-rule"></span>
+          <span class="stat-label" data-i18n="stat_wines">Wines</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<section id="how">
+  <div class="section-label fade-in" data-i18n="how_label">The experience</div>
+  <h2 class="fade-in d1" data-i18n="how_title">How it works</h2>
+  <div class="steps fade-in d2">
+    <div class="step"><div class="step-num">01</div><h3 data-i18n="step1_title">Walk through the cellar</h3><p data-i18n="step1_text">Move freely and discover wines at your own pace. No guide, no rush.</p></div>
+    <div class="step"><div class="step-num">02</div><h3 data-i18n="step2_title">Scan and explore</h3><p data-i18n="step2_text">Learn about wines, winemakers and regions. Every bottle has a story.</p></div>
+    <div class="step"><div class="step-num">03</div><h3 data-i18n="step3_title">Choose your tasting</h3><p data-i18n="step3_text">Select one of our tasting experiences, designed for different interests.</p></div>
+    <div class="step"><div class="step-num">04</div><h3 data-i18n="step4_title">Taste and choose</h3><p data-i18n="step4_text">Find the wines you enjoy and take them home with you.</p></div>
+  </div>
+  <div class="how-cta fade-in d3"><a href="#booking" class="btn-primary" data-i18n="btn_book">Book a tasting</a></div>
+</section>
+<hr class="divider">
+<section id="tastings">
+  <div class="section-label fade-in" data-i18n="tasting_label">Tasting experiences</div>
+  <h2 class="fade-in d1" data-i18n="tasting_title">Wine Tasting<br><em>Experiences</em></h2>
+  <p class="tastings-intro fade-in d2" data-i18n="tasting_intro">Choose a tasting and discover Slovenian wines in a simple and enjoyable way.</p>
+  <div class="tastings-grid fade-in d3">
+    <div class="tasting-card">
+      <img src="images/tasting-1.jpg" alt="Wine Journey" class="tasting-img" onerror="this.style.display='none'">
+      <div class="tasting-tag" data-i18n="t1_tag">Introduction</div>
+      <h3 data-i18n="t1_name">Wine Journey</h3>
+      <p data-i18n="t1_desc">A curated selection of wines from different Slovenian regions, designed as an introduction to the country's wine landscape.</p>
+      <div class="tasting-meta"><span class="tasting-pill" data-i18n="pill_5wines">5 wines</span><span class="tasting-pill">60–75 min</span></div>
+      <div class="tasting-note" data-i18n="t1_note">Perfect for your first visit.</div>
+    </div>
+    <div class="tasting-card featured">
+      <img src="images/tasting-2.jpg" alt="Wine Stories" class="tasting-img" onerror="this.style.display='none'">
+      <div class="tasting-tag" data-i18n="t2_tag">Themed · Changes regularly</div>
+      <h3 data-i18n="t2_name">Wine Stories</h3>
+      <p data-i18n="t2_desc">A themed tasting focusing on grape varieties, styles or winemaking approaches. Discover different sides of Slovenian wine.</p>
+      <div class="tasting-theme" data-i18n="t2_theme">Current theme: Indigenous grape varieties</div>
+      <div class="tasting-meta"><span class="tasting-pill" data-i18n="pill_5wines">5 wines</span><span class="tasting-pill">60–75 min</span></div>
+      <div class="tasting-note" data-i18n="t2_note">Changes regularly.</div>
+    </div>
+    <div class="tasting-card">
+      <img src="images/tasting-3.jpg" alt="Sommelier Selection" class="tasting-img" onerror="this.style.display='none'">
+      <div class="tasting-tag" data-i18n="t3_tag">In depth</div>
+      <h3 data-i18n="t3_name">Sommelier Selection</h3>
+      <p data-i18n="t3_desc">Wines chosen by our sommelier for their depth, character and expression. Discover more complex styles of Slovenian wine.</p>
+      <div class="tasting-meta"><span class="tasting-pill" data-i18n="pill_5wines">5 wines</span><span class="tasting-pill">75–90 min</span></div>
+      <div class="tasting-note" data-i18n="t3_note">For those who want to go deeper.</div>
+    </div>
+  </div>
+  <a href="#booking" class="btn-primary fade-in" data-i18n="btn_book">Book a tasting</a>
+</section>
+<hr class="divider">
+<section id="explore">
+  <div class="section-label fade-in" data-i18n="explore_label">The collection</div>
+  <h2 class="fade-in d1" data-i18n="explore_title">Find your <em>wine</em></h2>
+  <p class="explore-text fade-in d2" data-i18n="explore_text">Explore Slovenian wines through regions, winemakers and grape varieties. Learn the stories behind every bottle and discover the wines you would like to take home.</p>
+  <div class="explore-grid fade-in d3">
+    <a class="explore-card" href="regions.html" style="grid-column:span 2">
+      <div class="explore-card-body">
+        <div class="explore-icon">◈</div>
+        <h3 data-i18n="ec1_title">Regions</h3>
+        <p data-i18n="ec1_text">From Prekmurje to Goriška Brda — nine districts, three regions, one country.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem 1.5rem;margin:0.75rem 0">
+          <div>
+            <div class="region-group-title">Podravje</div>
+            <ul class="region-list">
+              <li data-i18n="r1">Štajerska Slovenija</li>
+              <li data-i18n="r2">Prekmurje</li>
+            </ul>
+          </div>
+          <div>
+            <div class="region-group-title">Posavje</div>
+            <ul class="region-list">
+              <li data-i18n="r3">Dolenjska</li>
+              <li data-i18n="r4">Bizeljsko-Sremič</li>
+              <li data-i18n="r5">Bela krajina</li>
+            </ul>
+          </div>
+          <div>
+            <div class="region-group-title">Primorska</div>
+            <ul class="region-list">
+              <li data-i18n="r6">Goriška Brda</li>
+              <li data-i18n="r7">Vipavska dolina</li>
+              <li data-i18n="r8">Kras</li>
+              <li data-i18n="r9">Slovenska Istra</li>
+            </ul>
+          </div>
+        </div>
+        <span class="explore-arrow" data-i18n="ec1_link">Explore regions →</span>
+      </div>
+      <div class="explore-card-img">
+        <img src="images/map-slovenia.jpg" alt="Slovenia wine regions map">
+        <div class="explore-card-img-overlay"></div>
+      </div>
+    </a>
+    <a class="explore-card" href="/winemakers">
+      <div class="explore-card-body">
+        <div class="explore-icon">◉</div>
+        <h3 data-i18n="ec2_title">Winemakers</h3>
+        <p data-i18n="ec2_text">Meet the people behind the wines. Family estates, independent producers, each with their own philosophy.</p>
+        <span class="explore-arrow" data-i18n="ec2_link">Meet the producers →</span>
+      </div>
+      <div class="explore-card-img">
+        <img src="images/winemaker.jpg" alt="Winemaker pouring wine">
+        <div class="explore-card-img-overlay"></div>
+      </div>
+    </a>
+    <a class="explore-card" href="#">
+      <div class="explore-card-body">
+        <div class="explore-icon">◎</div>
+        <h3 data-i18n="ec3_title">Wines</h3>
+        <p data-i18n="ec3_text">Explore the wines currently available in the cellar. Filter by region, variety or style.</p>
+        <span class="explore-arrow" data-i18n="ec3_link">Browse wines →</span>
+      </div>
+      <div class="explore-card-img">
+        <img src="images/bottles.jpg" alt="Wine bottles">
+        <div class="explore-card-img-overlay"></div>
+      </div>
+    </a>
+  </div>
+</section>
+<hr class="divider">
+<section id="history">
+  <div class="history-grid">
+    <div class="history-text fade-in">
+      <div class="section-label" data-i18n="history_label">The cellar</div>
+      <h2 data-i18n="history_title">Wine was made <em>here.</em></h2>
+      <p data-i18n="history_p1">For decades, grapes from different Slovenian regions were brought to this cellar and <strong>transformed into wine</strong> for the guests of the famous Bled resort. These walls remember generations of travellers.</p>
+      <p data-i18n="history_p2">The original concrete tanks still stand — their walls marked by decades of fermentation, wine stone tracing the memory of every vintage.</p>
+      <p data-i18n="history_p3">Today, the cellar begins a new chapter — bringing together <strong>independent winemakers</strong> and the wines that represent their regions, their land, their character.</p>
+    </div>
+    <div class="history-visuals fade-in d2">
+      <div class="hist-img tall">
+        <img src="images/history-newspaper.jpg" alt="Historic newspaper archive" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:2px" onerror="this.style.display='none'">
+        Historic newspaper
+      </div>
+      <div class="hist-img" style="position:relative;overflow:hidden">
+        <img src="images/history-tanks.jpg" alt="Original concrete tanks" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display='none'">
+        Concrete tanks
+      </div>
+      <div class="hist-img" style="position:relative;overflow:hidden">
+        <img src="images/history-cellar.jpg" alt="The cellar today" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" onerror="this.style.display='none'">
+        The cellar today
+      </div>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<section id="gallery">
+  <div class="section-label fade-in" data-i18n="gallery_label">The space</div>
+  <div class="gallery-grid fade-in d1">
+    <div class="g-img g1"><img src="images/gallery-1.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div class="g-img g2"><img src="images/gallery-2.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div class="g-img g3"><img src="images/gallery-3.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div class="g-img g4"><img src="images/gallery-4.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div class="g-img g5"><img src="images/gallery-5.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+    <div class="g-img g6"><img src="images/gallery-6.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+  </div>
+  <p class="sig" data-i18n="gallery_sig">Where wine comes alive.</p>
+</section>
+<hr class="divider">
+<section id="booking">
+  <div class="booking-wrap">
+    <div class="section-label fade-in" style="justify-content:center" data-i18n="booking_label">Reserve your experience</div>
+    <h2 class="fade-in d1" data-i18n="booking_title">Book a tasting</h2>
+    <p class="booking-sub fade-in d2" data-i18n="booking_sub">Choose your tasting experience and preferred date. We'll confirm your reservation by email shortly.</p>
+    <form class="fade-in d3" id="booking-form">
+      <div class="form-grid">
+        <div class="form-field"><label data-i18n="f_fname">First name</label><input type="text" name="first_name" placeholder="Anna" required><span class="field-error" data-i18n="err_required">This field is required</span></div>
+        <div class="form-field"><label data-i18n="f_lname">Last name</label><input type="text" name="last_name" placeholder="Müller"></div>
+        <div class="form-field"><label data-i18n="f_email">Email</label><input type="email" name="email" placeholder="anna@example.com" required><span class="field-error" data-i18n="err_email">Please enter a valid email</span></div>
+        <div class="form-field"><label data-i18n="f_phone">Phone</label><input type="tel" name="phone" placeholder="+386 ..."></div>
+        <div class="form-field"><label data-i18n="f_tasting">Tasting experience</label>
+          <select name="tasting" required>
+            <option value="" disabled selected data-i18n="f_select">Select a tasting</option>
+            <option data-i18n="t1_opt">Wine Journey (60–75 min)</option>
+            <option data-i18n="t2_opt">Wine Stories (60–75 min)</option>
+            <option data-i18n="t3_opt">Sommelier Selection (75–90 min)</option>
+          </select>
+        </div>
+        <div class="form-field"><label data-i18n="f_guests">Number of guests</label>
+          <select name="guests" required><option value="" disabled selected>—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10+</option></select>
+        </div>
+        <div class="form-field"><label data-i18n="f_date">Preferred date</label><input type="date" name="date" required></div>
+        <div class="form-field"><label data-i18n="f_time">Preferred time</label>
+          <select name="time" required><option value="" disabled selected>—</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option></select>
+        </div>
+        <div class="form-field full"><label data-i18n="f_notes">Notes (optional)</label><textarea rows="3" name="notes" data-i18n-ph="f_notes_ph" placeholder="Allergies, special occasions, preferences…"></textarea></div>
+      </div>
+      <div class="form-submit">
+        <button type="submit" data-i18n="f_submit">Request booking</button>
+        <p class="form-note" data-i18n="f_note">We will confirm your booking by email shortly.</p>
+      </div>
+    </form>
+    <div id="form-success" style="display:none;text-align:center;padding:2.5rem;border:1px solid var(--border);border-radius:2px;margin-top:1rem">
+      <div style="font-size:2rem;margin-bottom:1rem">✓</div>
+      <p style="font-family:var(--serif);font-size:1.4rem;color:var(--cream);margin-bottom:0.75rem" data-i18n="success_title">Your request has been sent.</p>
+      <p style="font-size:0.88rem;color:var(--cream-dim)" data-i18n="success_sub">We will confirm your booking by email shortly.</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+<section id="visit">
+  <div class="visit-grid">
+    <div class="fade-in">
+      <div class="section-label" data-i18n="visit_label">Find us</div>
+      <h2 data-i18n="visit_title">Visit us <em>in Bled</em></h2>
+      <p class="visit-sub-text" data-i18n="visit_sub">Experience Slovenian wine in a historic cellar in the heart of Bled.</p>
+      <div class="visit-info">
+        <div class="visit-row"><div class="visit-row-label" data-i18n="vl_addr">Address</div><div class="visit-row-val">Prešernova cesta 66, 4260 Bled, Slovenija</div></div>
+        <div class="visit-row"><div class="visit-row-label" data-i18n="vl_hours">Hours</div><div class="visit-row-val">Monday – Sunday · 10:00 – 22:00</div></div>
+        <div class="visit-row"><div class="visit-row-label" data-i18n="vl_phone">Phone</div><div class="visit-row-val"><a href="tel:+38669929217" style="color:var(--cream-dim);text-decoration:none">+386 69 929 217</a></div></div>
+        <div class="visit-row"><div class="visit-row-label" data-i18n="vl_email">Email</div><div class="visit-row-val"><a href="mailto:bledvino@gmail.com" style="color:var(--cream-dim);text-decoration:none">bledvino@gmail.com</a></div></div>
+      </div>
+      <div class="visit-actions">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Prešernova+cesta+66,+4260+Bled,+Slovenija" target="_blank" class="btn-ghost" data-i18n="btn_dir">Get directions</a>
+        <a href="#booking" class="btn-primary" data-i18n="btn_book">Book a tasting</a>
+      </div>
+    </div>
+    <div class="visit-map fade-in d2" style="padding:0;overflow:hidden;border-radius:2px">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2755.123!2d14.1028!3d46.3684!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x477adf0e9bb9d6b5%3A0x0!2sPrešernova+cesta+66%2C+4260+Bled!5e0!3m2!1sen!2ssi!4v1"
+        width="100%" height="380" style="border:0;display:block;filter:grayscale(40%) contrast(1.1)"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="footer-logo">Vino <span>Bled</span> — Slovenia Wine Experience</div>
+  <div class="footer-copy">© 2025 Vino Bled. Bled, Slovenia.</div>
+</footer>
+
+
+<script>
+
+const T = {
+en:{
+  nav_about:"About",nav_tastings:"Tastings",nav_wines:"Wines",nav_visit:"Visit",nav_book:"Book a tasting",
+  hero_eyebrow:"Slovenia Wine Experience",
+  hero_title:"The wines<br>of Slovenia,<br><em>in one cellar.</em>",
+  hero_sub:"Discover Slovenian wine regions, taste selected wines and find the ones you truly enjoy — in a historic cellar in the heart of Bled.",
+  btn_book:"Book a tasting",btn_explore:"Explore wines",scroll:"Scroll",
+  concept_label:"The story",concept_title:"Where wine becomes a <em>language.</em>",
+  concept_p1:"In a historic cellar in the heart of Bled — where wine was once made for the guests of this famous resort — a new space has been born, dedicated to the wine terroirs of Slovenia.",
+  concept_p2:"These walls remember generations of travellers for whom Bled was and remains a symbol of hospitality. Today, instead of industrial production, <strong>independent winemakers</strong> whose wines reflect the character of their lands are gathered here.",
+  concept_p3:"Vino Bled brings together the wine regions of Slovenia, the people behind them, their stories and their craft. A journey through the country — from alpine hills to the Mediterranean coast — without leaving the cellar.",
+  concept_p4:"Here, wine is the language in which Slovenia tells its story to its guests.",
+  how_label:"The experience",how_title:"How it works",
+  step1_title:"Walk through the cellar",step1_text:"Move freely and discover wines at your own pace. No guide, no rush.",
+  step2_title:"Scan and explore",step2_text:"Learn about wines, winemakers and regions. Every bottle has a story.",
+  step3_title:"Choose your tasting",step3_text:"Select one of our tasting experiences, designed for different interests.",
+  step4_title:"Taste and choose",step4_text:"Find the wines you enjoy and take them home with you.",
+  tasting_label:"Tasting experiences",tasting_title:"Wine Tasting<br><em>Experiences</em>",
+  tasting_intro:"Choose a tasting and discover Slovenian wines in a simple and enjoyable way.",
+  t1_tag:"Introduction",t1_name:"Wine Journey",t1_desc:"A curated selection of wines from different Slovenian regions, designed as an introduction to the country's wine landscape.",t1_note:"Perfect for your first visit.",
+  t1_opt:"Wine Journey (60–75 min)",
+  t2_tag:"Themed · Changes regularly",t2_name:"Wine Stories",t2_desc:"A themed tasting focusing on grape varieties, styles or winemaking approaches. Discover different sides of Slovenian wine.",t2_theme:"Current theme: Indigenous grape varieties",t2_note:"Changes regularly.",
+  t2_opt:"Wine Stories (60–75 min)",
+  t3_tag:"In depth",t3_name:"Sommelier Selection",t3_desc:"Wines chosen by our sommelier for their depth, character and expression. Discover more complex styles of Slovenian wine.",t3_note:"For those who want to go deeper.",
+  t3_opt:"Sommelier Selection (75–90 min)",
+  pill_5wines:"5 wines",
+  explore_label:"The collection",explore_title:"Find your <em>wine</em>",
+  explore_text:"Explore Slovenian wines through regions, winemakers and grape varieties. Learn the stories behind every bottle.",
+  ec1_title:"Regions",ec1_text:"Discover the character of Slovenia's wine regions — from the Vipava Valley to Goriška Brda and beyond.",ec1_link:"Explore regions →",
+  ec2_title:"Winemakers",ec2_text:"Meet the people behind the wines. Family estates, independent producers, each with their own philosophy.",ec2_link:"Meet the producers →",
+  ec3_title:"Wines",ec3_text:"Explore the wines currently available in the cellar. Filter by region, variety or style.",ec3_link:"Browse wines →",
+  history_label:"The cellar",history_title:"Wine was made <em>here.</em>",
+  history_p1:"For decades, grapes from different Slovenian regions were brought to this cellar and <strong>transformed into wine</strong> for the guests of the famous Bled resort.",
+  history_p2:"The original concrete tanks still stand — their walls marked by decades of fermentation, wine stone tracing the memory of every vintage.",
+  history_p3:"Today, the cellar begins a new chapter — bringing together <strong>independent winemakers</strong> and the wines that represent their regions, their land, their character.",
+  gallery_label:"The space",gallery_sig:"Where wine comes alive.",
+  booking_label:"Reserve your experience",booking_title:"Book a tasting",
+  booking_sub:"Choose your tasting experience and preferred date. We'll confirm your reservation by email shortly.",
+  f_fname:"First name",f_lname:"Last name",f_email:"Email",f_phone:"Phone",
+  f_tasting:"Tasting experience",f_select:"Select a tasting",
+  f_guests:"Number of guests",f_date:"Preferred date",f_time:"Preferred time",
+  f_notes:"Notes (optional)",f_notes_ph:"Allergies, special occasions, preferences…",
+  f_submit:"Request booking",f_note:"We will confirm your booking by email shortly.",
+  visit_label:"Find us",visit_title:"Visit us <em>in Bled</em>",
+  visit_sub:"Experience Slovenian wine in a historic cellar in the heart of Bled.",
+  vl_addr:"Address",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"Hours",v_hours:"Monday – Sunday · 10:00 – 22:00",
+  vl_phone:"Phone",vl_email:"Email",btn_dir:"Get directions",map_ph:"Map will appear here",
+  stat_winemakers:"Winemakers",
+  err_required:"This field is required",
+  success_title:"Your request has been sent.",success_sub:"We will confirm your booking by email shortly.",err_email:"Please enter a valid email",
+  ec1_text:"From Prekmurje to Goriška Brda — nine districts, three regions, one country.",ec1_link:"Explore regions →",r1:"Štajerska Slovenija",r2:"Prekmurje",r3:"Dolenjska",r4:"Bizeljsko-Sremič",r5:"Bela krajina",r6:"Goriška Brda",r7:"Vipavska dolina",r8:"Kras",r9:"Slovenska Istra",stat_regions:"Regions",stat_wines:"Wines"
+},
+sl:{
+  nav_about:"O nas",nav_tastings:"Degustacije",nav_wines:"Vina",nav_visit:"Obiščite nas",nav_book:"Rezervirajte degustacijo",
+  hero_eyebrow:"Doživetje slovenskega vina",
+  hero_title:"Vina<br>Slovenije,<br><em>v eni kleti.</em>",
+  hero_sub:"Odkrijte vinske regije Slovenije, pokušajte izbrana vina in poiščite tista, ki vam zares ustrezajo — v zgodovinski kleti v srcu Bleda.",
+  btn_book:"Rezervirajte degustacijo",btn_explore:"Odkrijte vina",scroll:"Drseti",
+  concept_label:"Zgodba",concept_title:"Kjer vino postane <em>jezik.</em>",
+  concept_p1:"V zgodovinski kleti v srcu Bleda — kjer so nekoč pridelovali vino za goste slavnega letovišča — se je rodil nov prostor, posvečen vinskim terrajem Slovenije.",
+  concept_p2:"Te stene se spominjajo generacij popotnikov, za katere je Bled bil in ostaja simbol gostoljubnosti. Danes tu domujejo <strong>neodvisni vinarji</strong>, katerih vina odsevajo karakter svojih zemljišč.",
+  concept_p3:"Vino Bled združuje vinske regije Slovenije, ljudi za njimi, njihove zgodbe in znanje. Potovanje skozi deželo — od alpskih gričev do sredozemske obale — ne da bi zapustili klet.",
+  concept_p4:"Tu je vino jezik, v katerem Slovenija pripoveduje svojo zgodbo gostom.",
+  how_label:"Doživetje",how_title:"Kako deluje",
+  step1_title:"Sprehodite se po kleti",step1_text:"Gibajte se prosto in odkrivajte vina v svojem tempu. Brez vodnika, brez naglice.",
+  step2_title:"Skenirajte in spoznajte",step2_text:"Izvejte o vinih, vinarjih in regijah. Vsaka steklenica ima svojo zgodbo.",
+  step3_title:"Izberite degustacijo",step3_text:"Izberite eno od naših degustacijskih doživetij.",
+  step4_title:"Pokušajte in izberite",step4_text:"Poiščite vina, ki vam ustrezajo, in jih vzemite domov.",
+  tasting_label:"Degustacijska doživetja",tasting_title:"Degustacije<br><em>vin</em>",
+  tasting_intro:"Izberite degustacijo in odkrijte slovenska vina na preprost in prijeten način.",
+  t1_tag:"Uvod",t1_name:"Vinsko potovanje",t1_desc:"Izbrana selekcija vin iz različnih slovenskih regij, zasnovana kot uvod v vinsko pokrajino dežele.",t1_note:"Idealno za prvi obisk.",
+  t1_opt:"Vinsko potovanje (60–75 min)",
+  t2_tag:"Tematska · Se menja",t2_name:"Vinske zgodbe",t2_desc:"Tematska degustacija o sortah grozdja, slogih ali pristopih. Odkrijte različne plati slovenskega vina.",t2_theme:"Trenutna tema: Avtohtone sorte grozdja",t2_note:"Se redno menja.",
+  t2_opt:"Vinske zgodbe (60–75 min)",
+  t3_tag:"Poglobljeno",t3_name:"Sommelier selekcija",t3_desc:"Vina, ki jih je izbral naš sommelier za globino, karakter in izraz.",t3_note:"Za tiste, ki želijo iti globlje.",
+  t3_opt:"Sommelier selekcija (75–90 min)",
+  pill_5wines:"5 vin",
+  explore_label:"Zbirka",explore_title:"Poiščite <em>svoje vino</em>",
+  explore_text:"Odkrivajte slovenska vina po regijah, vinarjih in sortah. Spoznajte zgodbe za vsako steklenico.",
+  ec1_title:"Regije",ec1_text:"Odkrijte karakter slovenskih vinskih regij — od Vipavske doline do Goriških Brd.",ec1_link:"Odkrijte regije →",
+  ec2_title:"Vinarji",ec2_text:"Spoznajte ljudi za vini. Družinske kleti, neodvisni pridelovalci.",ec2_link:"Spoznajte pridelovalce →",
+  ec3_title:"Vina",ec3_text:"Odkrijte vina v kleti. Filtrirajte po regiji, sorti ali slogu.",ec3_link:"Prebrskajte vina →",
+  history_label:"Klet",history_title:"Tu so pridelovali <em>vino.</em>",
+  history_p1:"Desetletja so v to klet prinašali grozdje iz različnih regij in ga <strong>predelovali v vino</strong> za goste blejskega letovišča.",
+  history_p2:"Originalni betonski tanki še stojijo — zaznamovani z desetletji fermentacije, vinska kamen sledi spominu vsakega letnika.",
+  history_p3:"Danes klet začenja novo poglavje — združuje <strong>neodvisne vinarje</strong> in vina, ki zastopajo njihove regije.",
+  gallery_label:"Prostor",gallery_sig:"Kjer vino oživi.",
+  booking_label:"Rezervirajte doživetje",booking_title:"Rezervirajte degustacijo",
+  booking_sub:"Izberite doživetje in željeni datum. Rezervacijo bomo potrdili po e-pošti v kratkem.",
+  f_fname:"Ime",f_lname:"Priimek",f_email:"E-pošta",f_phone:"Telefon",
+  f_tasting:"Degustacijsko doživetje",f_select:"Izberite degustacijo",
+  f_guests:"Število gostov",f_date:"Željeni datum",f_time:"Željeni čas",
+  f_notes:"Opombe (neobvezno)",f_notes_ph:"Alergije, posebne priložnosti…",
+  f_submit:"Zahtevajte rezervacijo",f_note:"Rezervacijo bomo potrdili v kratkem.",
+  visit_label:"Najdite nas",visit_title:"Obiščite nas <em>v Bledu</em>",
+  visit_sub:"Doživite slovensko vino v zgodovinski kleti v srcu Bleda.",
+  vl_addr:"Naslov",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"Delovni čas",v_hours:"Vsak dan · 10:00 – 22:00",
+  vl_phone:"Telefon",vl_email:"E-pošta",btn_dir:"Pridobi navodila",map_ph:"Tukaj bo karta",
+  stat_winemakers:"Vinarji",
+  err_required:"To polje je obvezno",
+  success_title:"Vaša zahteva je bila poslana.",success_sub:"Rezervacijo bomo potrdili po e-pošti v kratkem.",err_email:"Vnesite veljaven e-naslov",
+  ec1_text:"Od Prekmurja do Goriških Brd — devet okolišev, tri dežele, ena država.",ec1_link:"Odkrijte regije →",r1:"Štajerska Slovenija",r2:"Prekmurje",r3:"Dolenjska",r4:"Bizeljsko-Sremič",r5:"Bela krajina",r6:"Goriška Brda",r7:"Vipavska dolina",r8:"Kras",r9:"Slovenska Istra",stat_regions:"Regije",stat_wines:"Vina"
+},
+de:{
+  nav_about:"Über uns",nav_tastings:"Verkostungen",nav_wines:"Weine",nav_visit:"Besuchen Sie uns",nav_book:"Verkostung buchen",
+  hero_eyebrow:"Slovenia Wine Experience",
+  hero_title:"Die Weine<br>Sloweniens,<br><em>in einem Keller.</em>",
+  hero_sub:"Entdecken Sie die Weinregionen Sloweniens, verkosten Sie ausgewählte Weine und finden Sie jene, die Sie begeistern — in einem historischen Keller im Herzen von Bled.",
+  btn_book:"Verkostung buchen",btn_explore:"Weine entdecken",scroll:"Scrollen",
+  concept_label:"Die Geschichte",concept_title:"Wo Wein zur <em>Sprache wird.</em>",
+  concept_p1:"In einem historischen Keller im Herzen von Bled — wo einst Wein für die Gäste dieses berühmten Kurorts gekeltert wurde — ist ein neuer Ort entstanden, dem Weinterroir Sloweniens gewidmet.",
+  concept_p2:"Diese Wände erinnern sich an Generationen von Reisenden. Heute beherbergt der Keller <strong>unabhängige Winzer</strong>, deren Weine den Charakter ihrer Böden widerspiegeln.",
+  concept_p3:"Vino Bled vereint die Weinregionen Sloweniens, die Menschen dahinter, ihre Geschichten und ihr Handwerk. Eine Reise von den Alpenausläufern bis zur Mittelmeerküste — ohne den Keller zu verlassen.",
+  concept_p4:"Hier ist Wein die Sprache, in der Slowenien seinen Gästen seine Geschichte erzählt.",
+  how_label:"Das Erlebnis",how_title:"So funktioniert es",
+  step1_title:"Durch den Keller wandern",step1_text:"Bewegen Sie sich frei und entdecken Sie Weine in Ihrem eigenen Tempo.",
+  step2_title:"Scannen und erkunden",step2_text:"Erfahren Sie mehr über Weine, Winzer und Regionen.",
+  step3_title:"Verkostung wählen",step3_text:"Wählen Sie eines unserer Verkostungserlebnisse.",
+  step4_title:"Verkosten und wählen",step4_text:"Finden Sie Ihre Lieblingsweine und nehmen Sie sie mit nach Hause.",
+  tasting_label:"Verkostungserlebnisse",tasting_title:"Wein<br><em>Verkostungen</em>",
+  tasting_intro:"Wählen Sie eine Verkostung und entdecken Sie slowenische Weine auf genussvolle Weise.",
+  t1_tag:"Einführung",t1_name:"Weinreise",t1_desc:"Eine kuratierte Auswahl von Weinen aus verschiedenen slowenischen Regionen als Einführung in die Weinlandschaft des Landes.",t1_note:"Ideal für Ihren ersten Besuch.",
+  t1_opt:"Weinreise (60–75 Min.)",
+  t2_tag:"Thematisch · Wechselt regelmäßig",t2_name:"Weingeschichten",t2_desc:"Eine thematische Verkostung zu Rebsorten, Stilen oder Kelterungsansätzen.",t2_theme:"Aktuelles Thema: Autochthone Rebsorten",t2_note:"Wechselt regelmäßig.",
+  t2_opt:"Weingeschichten (60–75 Min.)",
+  t3_tag:"Vertiefend",t3_name:"Sommelier-Auswahl",t3_desc:"Vom Sommelier ausgewählte Weine für ihre Tiefe, Charakter und Ausdruck.",t3_note:"Für alle, die tiefer eintauchen möchten.",
+  t3_opt:"Sommelier-Auswahl (75–90 Min.)",
+  pill_5wines:"5 Weine",
+  explore_label:"Die Kollektion",explore_title:"Finden Sie <em>Ihren Wein</em>",
+  explore_text:"Erkunden Sie slowenische Weine nach Regionen, Winzern und Rebsorten.",
+  ec1_title:"Regionen",ec1_text:"Entdecken Sie den Charakter der slowenischen Weinregionen — vom Vipava-Tal bis Goriška Brda.",ec1_link:"Regionen erkunden →",
+  ec2_title:"Winzer",ec2_text:"Lernen Sie die Menschen hinter den Weinen kennen. Familienbetriebe, unabhängige Erzeuger.",ec2_link:"Winzer kennenlernen →",
+  ec3_title:"Weine",ec3_text:"Erkunden Sie die aktuell im Keller verfügbaren Weine.",ec3_link:"Weine durchsuchen →",
+  history_label:"Der Keller",history_title:"Hier wurde Wein <em>gemacht.</em>",
+  history_p1:"Jahrzehntelang wurden Trauben aus verschiedenen Regionen in diesen Keller gebracht und für die Gäste des Kurorts Bled zu Wein <strong>verarbeitet</strong>.",
+  history_p2:"Die originalen Betontanks stehen noch immer — Weinstein als Zeuge jedes Jahrgangs.",
+  history_p3:"Heute beginnt der Keller ein neues Kapitel — er vereint <strong>unabhängige Winzer</strong> und Weine, die ihre Regionen verkörpern.",
+  gallery_label:"Der Raum",gallery_sig:"Wo Wein lebendig wird.",
+  booking_label:"Ihr Erlebnis reservieren",booking_title:"Verkostung buchen",
+  booking_sub:"Wählen Sie Ihr Erlebnis und Ihr bevorzugtes Datum. Wir bestätigen per E-Mail in Kürze.",
+  f_fname:"Vorname",f_lname:"Nachname",f_email:"E-Mail",f_phone:"Telefon",
+  f_tasting:"Verkostungserlebnis",f_select:"Verkostung auswählen",
+  f_guests:"Anzahl der Gäste",f_date:"Bevorzugtes Datum",f_time:"Bevorzugte Uhrzeit",
+  f_notes:"Anmerkungen (optional)",f_notes_ph:"Allergien, besondere Anlässe…",
+  f_submit:"Buchung anfragen",f_note:"Wir bestätigen Ihre Buchung per E-Mail in Kürze.",
+  visit_label:"Finden Sie uns",visit_title:"Besuchen Sie uns <em>in Bled</em>",
+  visit_sub:"Erleben Sie slowenischen Wein in einem historischen Keller im Herzen von Bled.",
+  vl_addr:"Adresse",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"Öffnungszeiten",v_hours:"Täglich · 10:00 – 22:00 Uhr",
+  vl_phone:"Telefon",vl_email:"E-Mail",btn_dir:"Route planen",map_ph:"Karte wird hier angezeigt",
+  stat_winemakers:"Winzer",
+  err_required:"Dieses Feld ist erforderlich",
+  success_title:"Ihre Anfrage wurde gesendet.",success_sub:"Wir bestätigen Ihre Buchung per E-Mail in Kürze.",err_email:"Bitte gültige E-Mail eingeben",
+  ec1_text:"Von Prekmurje bis Goriška Brda — neun Bezirke, drei Regionen, ein Land.",ec1_link:"Regionen erkunden →",r1:"Štajerska Slovenija",r2:"Prekmurje",r3:"Dolenjska",r4:"Bizeljsko-Sremič",r5:"Bela krajina",r6:"Goriška Brda",r7:"Vipavska dolina (Vipava-Tal)",r8:"Kras (Karst)",r9:"Slovenska Istra",stat_regions:"Regionen",stat_wines:"Weine"
+},
+it:{
+  nav_about:"Chi siamo",nav_tastings:"Degustazioni",nav_wines:"Vini",nav_visit:"Visitaci",nav_book:"Prenota una degustazione",
+  hero_eyebrow:"Slovenia Wine Experience",
+  hero_title:"I vini<br>della Slovenia,<br><em>in un'unica cantina.</em>",
+  hero_sub:"Scopri le regioni vinicole della Slovenia, degusta vini selezionati e trova quelli che ami davvero — in una cantina storica nel cuore di Bled.",
+  btn_book:"Prenota una degustazione",btn_explore:"Esplora i vini",scroll:"Scorri",
+  concept_label:"La storia",concept_title:"Dove il vino diventa <em>linguaggio.</em>",
+  concept_p1:"In una cantina storica nel cuore di Bled — dove un tempo si produceva vino per gli ospiti di questo famoso centro termale — è nato un nuovo spazio dedicato ai terroir vinicoli della Slovenia.",
+  concept_p2:"Queste mura ricordano generazioni di viaggiatori. Oggi accolgono <strong>vignaioli indipendenti</strong> i cui vini rispecchiano il carattere delle loro terre.",
+  concept_p3:"Vino Bled riunisce le regioni vinicole della Slovenia, le persone che le animano, le loro storie. Un viaggio dalle colline alpine alla costa mediterranea — senza lasciare la cantina.",
+  concept_p4:"Qui il vino è la lingua con cui la Slovenia racconta se stessa ai suoi ospiti.",
+  how_label:"L'esperienza",how_title:"Come funziona",
+  step1_title:"Passeggia nella cantina",step1_text:"Muoviti liberamente e scopri i vini al tuo ritmo. Nessuna guida, nessuna fretta.",
+  step2_title:"Scansiona ed esplora",step2_text:"Scopri vini, produttori e regioni. Ogni bottiglia ha la sua storia.",
+  step3_title:"Scegli la tua degustazione",step3_text:"Seleziona una delle nostre esperienze di degustazione.",
+  step4_title:"Assaggia e scegli",step4_text:"Trova i vini che ami e portali a casa con te.",
+  tasting_label:"Esperienze di degustazione",tasting_title:"Degustazioni<br><em>di vino</em>",
+  tasting_intro:"Scegli una degustazione e scopri i vini sloveni in modo semplice e piacevole.",
+  t1_tag:"Introduzione",t1_name:"Wine Journey",t1_desc:"Una selezione curata di vini da diverse regioni slovene, pensata come introduzione al paesaggio vinicolo del paese.",t1_note:"Perfetta per la prima visita.",
+  t1_opt:"Wine Journey (60–75 min)",
+  t2_tag:"A tema · Cambia regolarmente",t2_name:"Wine Stories",t2_desc:"Una degustazione a tema incentrata su vitigni, stili o approcci enologici.",t2_theme:"Tema attuale: Vitigni autoctoni",t2_note:"Cambia regolarmente.",
+  t2_opt:"Wine Stories (60–75 min)",
+  t3_tag:"Approfondimento",t3_name:"Selezione del Sommelier",t3_desc:"Vini scelti dal nostro sommelier per profondità, carattere ed espressione.",t3_note:"Per chi vuole andare più in profondità.",
+  t3_opt:"Selezione del Sommelier (75–90 min)",
+  pill_5wines:"5 vini",
+  explore_label:"La collezione",explore_title:"Trova il tuo <em>vino</em>",
+  explore_text:"Esplora i vini sloveni per regioni, produttori e vitigni. Scopri le storie dietro ogni bottiglia.",
+  ec1_title:"Regioni",ec1_text:"Scopri il carattere delle regioni vinicole slovene — dalla Valle del Vipacco a Goriška Brda.",ec1_link:"Esplora le regioni →",
+  ec2_title:"Produttori",ec2_text:"Incontra le persone dietro i vini. Aziende familiari, produttori indipendenti.",ec2_link:"Incontra i produttori →",
+  ec3_title:"Vini",ec3_text:"Esplora i vini attualmente disponibili in cantina.",ec3_link:"Sfoglia i vini →",
+  history_label:"La cantina",history_title:"Qui si faceva <em>il vino.</em>",
+  history_p1:"Per decenni, l'uva da diverse regioni slovene veniva portata qui e <strong>trasformata in vino</strong> per gli ospiti del centro termale di Bled.",
+  history_p2:"Le vasche di cemento originali sono ancora lì — il tartaro a testimoniare ogni vendemmia.",
+  history_p3:"Oggi la cantina inizia un nuovo capitolo — riunendo <strong>vignaioli indipendenti</strong> e i vini che rappresentano le loro terre.",
+  gallery_label:"Lo spazio",gallery_sig:"Dove il vino prende vita.",
+  booking_label:"Prenota la tua esperienza",booking_title:"Prenota una degustazione",
+  booking_sub:"Scegli la tua esperienza e la data preferita. Confermeremo la tua prenotazione via email a breve.",
+  f_fname:"Nome",f_lname:"Cognome",f_email:"Email",f_phone:"Telefono",
+  f_tasting:"Esperienza di degustazione",f_select:"Seleziona una degustazione",
+  f_guests:"Numero di ospiti",f_date:"Data preferita",f_time:"Orario preferito",
+  f_notes:"Note (opzionale)",f_notes_ph:"Allergie, occasioni speciali…",
+  f_submit:"Richiedi prenotazione",f_note:"Confermeremo la tua prenotazione a breve.",
+  visit_label:"Come trovarci",visit_title:"Visitaci <em>a Bled</em>",
+  visit_sub:"Vivi l'esperienza del vino sloveno in una cantina storica nel cuore di Bled.",
+  vl_addr:"Indirizzo",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"Orari",v_hours:"Lunedì – Domenica · 10:00 – 22:00",
+  vl_phone:"Telefono",vl_email:"Email",btn_dir:"Come arrivare",map_ph:"La mappa apparirà qui",
+  stat_winemakers:"Produttori",
+  err_required:"Questo campo è obbligatorio",
+  success_title:"La tua richiesta è stata inviata.",success_sub:"Confermeremo la tua prenotazione via email a breve.",err_email:"Inserisci un'email valida",
+  ec1_text:"Da Prekmurje a Goriška Brda — nove distretti, tre regioni, un paese.",ec1_link:"Esplora le regioni →",r1:"Štajerska Slovenija",r2:"Prekmurje",r3:"Dolenjska",r4:"Bizeljsko-Sremič",r5:"Bela krajina",r6:"Goriška Brda",r7:"Valle del Vipacco",r8:"Carso",r9:"Istria Slovena",stat_regions:"Regioni",stat_wines:"Vini"
+},
+ru:{
+  nav_about:"О нас",nav_tastings:"Дегустации",nav_wines:"Вина",nav_visit:"Как нас найти",nav_book:"Забронировать дегустацию",
+  hero_eyebrow:"Винный опыт Словении",
+  hero_title:"Вина<br>Словении,<br><em>в одном погребе.</em>",
+  hero_sub:"Откройте для себя винные регионы Словении, продегустируйте отборные вина и найдите те, что придутся вам по душе — в историческом погребе в самом сердце Бледа.",
+  btn_book:"Забронировать дегустацию",btn_explore:"Изучить вина",scroll:"Прокрутить",
+  concept_label:"История",concept_title:"Где вино становится <em>языком.</em>",
+  concept_p1:"В историческом погребе в сердце Бледа — где когда-то делали вино для гостей этого знаменитого курорта — родилось пространство, посвящённое винным терруарам Словении.",
+  concept_p2:"Эти стены помнят поколения путешественников. Сегодня здесь представлены <strong>семейные виноделы</strong>, чьи вина отражают характер своих земель.",
+  concept_p3:"Vino Bled объединяет винные регионы Словении, людей, стоящих за ними, их истории и опыт. Путешествие от альпийских холмов до средиземноморского побережья — не покидая погреба.",
+  concept_p4:"Здесь вино становится языком, на котором Словения рассказывает о себе своим гостям.",
+  how_label:"Как это устроено",how_title:"Как это работает",
+  step1_title:"Прогуляйтесь по погребу",step1_text:"Двигайтесь свободно, открывайте вина в своём темпе. Без экскурсовода, без спешки.",
+  step2_title:"Сканируйте и узнавайте",step2_text:"Узнайте о винах, виноделах и регионах. У каждой бутылки есть история.",
+  step3_title:"Выберите дегустацию",step3_text:"Выберите одну из наших дегустационных программ.",
+  step4_title:"Попробуйте и выберите",step4_text:"Найдите вина, которые вам нравятся, и возьмите их домой.",
+  tasting_label:"Дегустационные программы",tasting_title:"Дегустации<br><em>вин</em>",
+  tasting_intro:"Выберите дегустацию и откройте для себя словенские вина — просто и с удовольствием.",
+  t1_tag:"Введение",t1_name:"Винное путешествие",t1_desc:"Подборка вин из разных регионов Словении — идеальное введение в винный ландшафт страны.",t1_note:"Идеально для первого визита.",
+  t1_opt:"Винное путешествие (60–75 мин)",
+  t2_tag:"Тематическая · Меняется регулярно",t2_name:"Винные истории",t2_desc:"Тематическая дегустация, посвящённая сортам винограда, стилям или подходам к виноделию.",t2_theme:"Текущая тема: Автохтонные сорта винограда",t2_note:"Меняется регулярно.",
+  t2_opt:"Винные истории (60–75 мин)",
+  t3_tag:"Углублённая",t3_name:"Выбор сомелье",t3_desc:"Вина, выбранные нашим сомелье за глубину, характер и выразительность.",t3_note:"Для тех, кто хочет узнать больше.",
+  t3_opt:"Выбор сомелье (75–90 мин)",
+  pill_5wines:"5 вин",
+  explore_label:"Коллекция",explore_title:"Найдите <em>своё вино</em>",
+  explore_text:"Исследуйте словенские вина по регионам, виноделам и сортам. Узнайте историю каждой бутылки.",
+  ec1_title:"Регионы",ec1_text:"Откройте характер винных регионов Словении — от долины Випава до Горишка Брда.",ec1_link:"Изучить регионы →",
+  ec2_title:"Виноделы",ec2_text:"Познакомьтесь с людьми, стоящими за винами. Семейные хозяйства, независимые производители.",ec2_link:"Познакомиться с виноделами →",
+  ec3_title:"Вина",ec3_text:"Изучите вина, представленные в погребе прямо сейчас.",ec3_link:"Просмотреть вина →",
+  history_label:"Погреб",history_title:"Здесь делали <em>вино.</em>",
+  history_p1:"Десятилетиями в этот погреб привозили виноград из разных регионов Словении и <strong>превращали его в вино</strong> для гостей курорта Блед.",
+  history_p2:"Оригинальные бетонные цистерны стоят до сих пор — винный камень как память о каждом урожае.",
+  history_p3:"Сегодня погреб начинает новую главу — объединяя <strong>независимых виноделов</strong> и вина, отражающие их регионы.",
+  gallery_label:"Пространство",gallery_sig:"Где вино оживает.",
+  booking_label:"Забронировать опыт",booking_title:"Забронировать дегустацию",
+  booking_sub:"Выберите программу и удобную дату. Мы подтвердим бронирование по электронной почте в ближайшее время.",
+  f_fname:"Имя",f_lname:"Фамилия",f_email:"Email",f_phone:"Телефон",
+  f_tasting:"Дегустационная программа",f_select:"Выберите дегустацию",
+  f_guests:"Количество гостей",f_date:"Предпочтительная дата",f_time:"Предпочтительное время",
+  f_notes:"Примечания (необязательно)",f_notes_ph:"Аллергии, особые случаи, пожелания…",
+  f_submit:"Отправить запрос",f_note:"Мы подтвердим вашу бронь в ближайшее время.",
+  visit_label:"Как нас найти",visit_title:"Посетите нас <em>в Бледе</em>",
+  visit_sub:"Откройте для себя словенское вино в историческом погребе в самом сердце Бледа.",
+  vl_addr:"Адрес",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"Часы работы",v_hours:"Ежедневно · 10:00 – 22:00",
+  vl_phone:"Телефон",vl_email:"Email",btn_dir:"Проложить маршрут",map_ph:"Здесь появится карта",
+  stat_winemakers:"Виноделов",
+  err_required:"Это обязательное поле",
+  success_title:"Ваш запрос отправлен.",success_sub:"Мы подтвердим бронирование по электронной почте в ближайшее время.",err_email:"Введите корректный email",
+  ec1_text:"От Прекмурья до Горишка Брда — девять районов, три региона, одна страна.",ec1_link:"Изучить регионы →",r1:"Штаерская Словения",r2:"Прекмурье",r3:"Доленьская",r4:"Бизельско-Шремич",r5:"Бела Краина",r6:"Горишка Брда",r7:"Долина Випава",r8:"Карст",r9:"Словенская Истрия",stat_regions:"Регионов",stat_wines:"Вин"
+},
+zh:{
+  nav_about:"关于我们",nav_tastings:"品酒体验",nav_wines:"葡萄酒",nav_visit:"前来拜访",nav_book:"预订品酒",
+  hero_eyebrow:"斯洛文尼亚葡萄酒体验",
+  hero_title:"斯洛文尼亚的美酒，<br><em>汇聚一窖。</em>",
+  hero_sub:"探索斯洛文尼亚的葡萄酒产区，品鉴精选佳酿，找到真正打动您的那一款——就在布莱德历史酒窖之中。",
+  btn_book:"预订品酒",btn_explore:"探索葡萄酒",scroll:"向下滚动",
+  concept_label:"我们的故事",concept_title:"葡萄酒成为<em>语言</em>的地方",
+  concept_p1:"在布莱德的历史酒窖中——这里曾为著名度假地的宾客酿造美酒——一个全新的空间诞生了，专注于呈现斯洛文尼亚的葡萄酒风土。",
+  concept_p2:"这些墙壁见证了一代又一代旅人。如今，<strong>独立酿酒师</strong>在此汇聚，他们的美酒映照着各自土地的个性。",
+  concept_p3:"Vino Bled将斯洛文尼亚的葡萄酒产区、酿酒师们的故事汇聚于一处。从阿尔卑斯山麓到地中海海岸，无需走出酒窖。",
+  concept_p4:"在这里，葡萄酒是斯洛文尼亚向宾客讲述自身故事的语言。",
+  how_label:"体验流程",how_title:"如何进行",
+  step1_title:"漫步酒窖",step1_text:"自由探索，按自己的节奏发现每一款佳酿。无需导游，随心而行。",
+  step2_title:"扫描与探索",step2_text:"了解葡萄酒、酿酒师与产区的故事。每一瓶酒都有它的故事。",
+  step3_title:"选择品酒体验",step3_text:"从我们为不同兴趣设计的品酒体验中选择最适合您的。",
+  step4_title:"品尝与选购",step4_text:"找到真正令您心动的葡萄酒，带它们回家。",
+  tasting_label:"品酒体验",tasting_title:"葡萄酒<br><em>品鉴体验</em>",
+  tasting_intro:"选择一款品酒体验，以轻松愉快的方式探索斯洛文尼亚葡萄酒的世界。",
+  t1_tag:"入门",t1_name:"葡萄酒之旅",t1_desc:"精选来自斯洛文尼亚不同产区的葡萄酒，作为探索这片土地葡萄酒风貌的绝佳起点。",t1_note:"首次拜访的理想之选。",
+  t1_opt:"葡萄酒之旅（60–75 分钟）",
+  t2_tag:"主题策划 · 定期更新",t2_name:"葡萄酒故事",t2_desc:"以葡萄品种、酿造风格或工艺理念为主题的品酒活动。",t2_theme:"当前主题：本土葡萄品种",t2_note:"主题定期更换。",
+  t2_opt:"葡萄酒故事（60–75 分钟）",
+  t3_tag:"深度探索",t3_name:"侍酒师精选",t3_desc:"由侍酒师甄选，以深度、个性与表现力著称的佳酿。",t3_note:"献给希望深入了解的您。",
+  t3_opt:"侍酒师精选（75–90 分钟）",
+  pill_5wines:"5款葡萄酒",
+  explore_label:"珍藏系列",explore_title:"寻找<em>您的那款酒</em>",
+  explore_text:"按产区、酿酒师或葡萄品种探索斯洛文尼亚葡萄酒。了解每瓶酒背后的故事。",
+  ec1_title:"产区",ec1_text:"探索斯洛文尼亚各葡萄酒产区的特色——从维帕瓦河谷到戈里什卡布尔达。",ec1_link:"探索产区 →",
+  ec2_title:"酿酒师",ec2_text:"认识葡萄酒背后的人。家族酒庄、独立酿酒师——每位都有自己的哲学。",ec2_link:"认识酿酒师 →",
+  ec3_title:"葡萄酒",ec3_text:"探索酒窖中现有的葡萄酒，按产区、品种或风格筛选。",ec3_link:"浏览葡萄酒 →",
+  history_label:"酒窖",history_title:"这里曾经<em>酿造葡萄酒。</em>",
+  history_p1:"数十年间，来自斯洛文尼亚各地的葡萄汇聚于此，<strong>酿成美酒</strong>，奉献给布莱德这座著名度假地的宾客。",
+  history_p2:"最初的混凝土发酵罐依然伫立——酒石静默地记录着每一个年份的记忆。",
+  history_p3:"如今，酒窖翻开崭新的篇章——汇聚<strong>独立酿酒师</strong>与代表其产区、土地与个性的葡萄酒。",
+  gallery_label:"空间",gallery_sig:"葡萄酒在这里活了过来。",
+  booking_label:"预订您的体验",booking_title:"预订品酒",
+  booking_sub:"选择品酒体验与您的首选日期。我们将尽快通过电子邮件确认您的预订。",
+  f_fname:"名字",f_lname:"姓氏",f_email:"电子邮件",f_phone:"电话",
+  f_tasting:"品酒体验",f_select:"请选择品酒体验",
+  f_guests:"宾客人数",f_date:"首选日期",f_time:"首选时间",
+  f_notes:"备注（可选）",f_notes_ph:"过敏信息、特殊场合、个人偏好……",
+  f_submit:"提交预订申请",f_note:"我们将尽快通过电子邮件确认您的预订。",
+  visit_label:"如何前往",visit_title:"欢迎拜访<em>布莱德</em>",
+  visit_sub:"在布莱德心脏地带的历史酒窖中，体验斯洛文尼亚葡萄酒的魅力。",
+  vl_addr:"地址",v_addr:"Prešernova cesta 66, 4260 Bled, Slovenija",vl_hours:"营业时间",v_hours:"每日 · 10:00 – 22:00",
+  vl_phone:"电话",vl_email:"电子邮件",btn_dir:"获取路线",map_ph:"地图将显示于此",
+  stat_winemakers:"酿酒师",
+  err_required:"此项为必填项",
+  success_title:"您的请求已发送。",success_sub:"我们将尽快通过电子邮件确认您的预订。",err_email:"请输入有效的电子邮件",
+  ec1_text:"从普雷克穆列到戈里什卡布尔达——九个产区，三大区域，一个国家。",ec1_link:"探索产区 →",r1:"斯塔耶尔斯卡·斯洛文尼亚",r2:"普雷克穆列",r3:"多连斯卡",r4:"比泽利斯科-斯雷米奇",r5:"贝拉·克拉伊纳",r6:"戈里什卡布尔达",r7:"维帕瓦河谷",r8:"喀斯特",r9:"斯洛文尼亚伊斯特拉",stat_regions:"产区",stat_wines:"款葡萄酒"
+}
+};
+
+let lang='en';
+function setLang(l){
+  lang=l;
+  localStorage.setItem('vb_lang',l);
+  const t=T[l];
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(t[k]!==undefined) el.innerHTML=t[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const k=el.getAttribute('data-i18n-ph');
+    if(t[k]!==undefined) el.placeholder=t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.onclick.toString().includes("'"+l+"'"));
+  });
+  document.body.style.fontFamily=l==='zh'?"'Noto Serif SC',sans-serif":'';
+}
+
+// Restore saved language
+const savedLang=localStorage.getItem('vb_lang');
+if(savedLang) setLang(savedLang);
+
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>60));
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+// Validation — mark touched on blur
+document.querySelectorAll('.form-field input[required], .form-field select[required]').forEach(el => {
+  el.addEventListener('blur', () => el.classList.add('touched'));
+});
+
+// Submit via fetch
+document.getElementById('booking-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  // Validate
+  let valid = true;
+  this.querySelectorAll('input[required], select[required]').forEach(el => {
+    el.classList.add('touched');
+    if (!el.value.trim()) valid = false;
+  });
+  if (!valid) return;
+
+  const btn = this.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  const data = {};
+  new FormData(this).forEach((val, key) => data[key] = val);
+
+  try {
+    const res = await fetch('https://formspree.io/f/xrpzgdep', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      this.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = document.querySelector('[data-i18n="f_submit"]')?.textContent || 'Request booking';
+      alert('Something went wrong. Please try again.');
+    }
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = document.querySelector('[data-i18n="f_submit"]')?.textContent || 'Request booking';
+    alert('Connection error. Please try again.');
+  }
+});
+
+</script>
+</body>
+</html>
