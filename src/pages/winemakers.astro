@@ -129,17 +129,30 @@ footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify
             : <div class="winemaker-photo-placeholder">Photo</div>
           }
           <div class="winemaker-body">
-            <div class="winemaker-name">{wm.name}</div>
-            {wm.description && (
-              <div class="winemaker-desc"
-                   data-desc-en={wm.description.en || ''}
-                   data-desc-sl={wm.description.sl || ''}
-                   data-desc-de={wm.description.de || ''}
-                   data-desc-it={wm.description.it || ''}
-                   data-desc-ru={wm.description.ru || ''}
-                   data-desc-zh={wm.description.zh || ''}>
-                {wm.description.en || wm.description.sl || ''}
-              </div>
+  <div class="winemaker-name">{wm.name}</div>
+  {wm.winemakerName && (
+    <div class="winemaker-person">{wm.winemakerName}</div>
+  )}
+  {wm.description && (
+    <div class="winemaker-desc"
+         data-desc-en={wm.description.en || ''}
+         data-desc-sl={wm.description.sl || ''}
+         data-desc-de={wm.description.de || ''}
+         data-desc-it={wm.description.it || ''}
+         data-desc-ru={wm.description.ru || ''}
+         data-desc-zh={wm.description.zh || ''}>
+      {wm.description.en || wm.description.sl || ''}
+    </div>
+  )}
+  {wm.website && (
+    <a href={wm.website} target="_blank" rel="noopener" class="winemaker-link" data-i18n="visit_website">
+      Visit website →
+    </a>
+  )}
+</div>
+
+
+
             )}
             {wm.website && (
               <a href={wm.website} target="_blank" rel="noopener" class="winemaker-link" data-i18n="visit_website">
