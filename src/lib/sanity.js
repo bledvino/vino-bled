@@ -12,6 +12,7 @@ export async function getWinemakers() {
     *[_type == "winemaker"] | order(order asc, name asc) {
       _id,
       name,
+      winemakerName,
       slug,
       region,
       "photo": photo.asset->url,
