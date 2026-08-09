@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "astro": "^4.0.0",
-    "@astrojs/sanity": "^1.0.0",
     "@sanity/client": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
