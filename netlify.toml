@@ -1,4 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
 [[redirects]]
   from = "/"
-  to = "/vino-bled.html"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/regions"
+  to = "/regions.html"
   status = 200
